@@ -1,4 +1,4 @@
-import { UsersService } from './../users/users.service';
+import { UsersService } from '../users/services/users.service';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
