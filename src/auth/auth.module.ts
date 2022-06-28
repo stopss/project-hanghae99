@@ -7,6 +7,8 @@ import { PassportModule } from '@nestjs/passport';
 import { LocalStrategy } from './jwt/local.strategy';
 import { JwtModule } from '@nestjs/jwt';
 import { LoginUserDto } from './dto/login.request.dto';
+import { KaKaoStrategy } from './jwt/kakao.strategy';
+import { FacebookStrategy } from './jwt/facebook.strategy';
 
 @Module({
   imports: [
@@ -18,7 +20,13 @@ import { LoginUserDto } from './dto/login.request.dto';
       signOptions: { expiresIn: '1y' },
     }),
   ],
-  providers: [AuthService, LocalStrategy, LoginUserDto],
+  providers: [
+    AuthService,
+    LocalStrategy,
+    LoginUserDto,
+    KaKaoStrategy,
+    FacebookStrategy,
+  ],
   exports: [AuthService, LoginUserDto],
 })
 export class AuthModule {}

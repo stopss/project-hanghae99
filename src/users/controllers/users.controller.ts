@@ -5,12 +5,17 @@ import {
   Body,
   Controller,
   Get,
+  HttpCode,
+  HttpStatus,
   Post,
+  Req,
   UseFilters,
+  UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
 import { SignupUserDto } from '../dto/signup.request.dto';
 import { LoginUserDto } from 'src/auth/dto/login.request.dto';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('users')
 @UseFilters(new HttpExceptionFilter())
@@ -38,5 +43,34 @@ export class UsersController {
   @Post('/login')
   login(@Body() body: LoginUserDto) {
     return this.authService.jwtLogin(body);
+  }
+
+  @Get('/kakao')
+  @HttpCode(200)
+  @UseGuards(AuthGuard('kakao'))
+  async kakaoLogin() {
+    return HttpStatus.OK;
+  }
+
+  @Get('/kakao/redirect')
+  @HttpCode(200)
+  @UseGuards(AuthGuard('kakao'))
+  // async kakaoLoginCallback(@Req() req): Promise<{ accessToken: string }> {
+  kakaoLoginCallback(@Req() req): string {
+    return req.user;
+  }
+
+  @Get('/facebook')
+  @HttpCode(200)
+  @UseGuards(AuthGuard('facebook'))
+  async facebookLogin() {
+    return HttpStatus.OK;
+  }
+
+  @Get('/facebook/redirect')
+  @HttpCode(200)
+  @UseGuards(AuthGuard('facebook'))
+  facebookLoginCallback(@Req() req): string {
+    return req.user;
   }
 }
