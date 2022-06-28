@@ -4,12 +4,12 @@ import { Module, forwardRef } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { AuthService } from './auth.service';
 import { PassportModule } from '@nestjs/passport';
-import { LocalStrategy } from './jwt/local.strategy';
+// import { LocalStrategy } from './jwt/local.strategy';
 import { JwtModule } from '@nestjs/jwt';
 import { LoginUserDto } from './dto/login.request.dto';
-import { KaKaoStrategy } from './jwt/kakao.strategy';
-import { FacebookStrategy } from './jwt/facebook.strategy';
-import { NaverStrategy } from './jwt/naver.strategy';
+import { KaKaoStrategy } from './strategy/kakao.strategy';
+import { FacebookStrategy } from './strategy/facebook.strategy';
+import { NaverStrategy } from './strategy/naver.strategy';
 
 @Module({
   imports: [
@@ -23,7 +23,7 @@ import { NaverStrategy } from './jwt/naver.strategy';
   ],
   providers: [
     AuthService,
-    LocalStrategy,
+    // LocalStrategy,
     LoginUserDto,
     KaKaoStrategy,
     FacebookStrategy,
