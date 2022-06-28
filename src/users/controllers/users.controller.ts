@@ -73,4 +73,18 @@ export class UsersController {
   facebookLoginCallback(@Req() req): string {
     return req.user;
   }
+
+  @Get('/naver')
+  @HttpCode(200)
+  @UseGuards(AuthGuard('naver'))
+  async naverLogin() {
+    return HttpStatus.OK;
+  }
+
+  @Get('/naver/redirect')
+  @HttpCode(200)
+  @UseGuards(AuthGuard('naver'))
+  naverLoginCallback(@Req() req): string {
+    return req.user;
+  }
 }

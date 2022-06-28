@@ -9,6 +9,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { LoginUserDto } from './dto/login.request.dto';
 import { KaKaoStrategy } from './jwt/kakao.strategy';
 import { FacebookStrategy } from './jwt/facebook.strategy';
+import { NaverStrategy } from './jwt/naver.strategy';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { FacebookStrategy } from './jwt/facebook.strategy';
     LoginUserDto,
     KaKaoStrategy,
     FacebookStrategy,
+    NaverStrategy,
   ],
   exports: [AuthService, LoginUserDto],
 })
