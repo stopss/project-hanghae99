@@ -1,9 +1,8 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, HttpException } from '@nestjs/common';
 import { Repository } from 'typeorm';
+import { SignupUserDto } from '../dto/signup.request.dto';
 import { UserEntity } from '../models/users.entity';
-
-// This should be a real class/interface representing a user entity
-// export type User = any;
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -31,5 +30,25 @@ export class UsersService {
 
   async findAll() {
     return this.usersRepository.find();
+  }
+
+  async signup(body: SignupUserDto): Promise<any> {
+    const user = new UserEntity();
+    const { nickname, email, password, token, social } = body;
+    const userExist = await this.usersRepository.find({ where: { email } });
+
+    if (userExist.length !== 0) {
+      throw new HttpException('이미 존재하는 이메일입니다.', 400);
+    }
+
+    const saltOrRounds = 10;
+    const hashedPassword = await bcrypt.hash(password, saltOrRounds);
+
+    user.nickname = nickname;
+    user.email = email;
+    user.password = hashedPassword;
+    user.token = token;
+    user.social = social;
+    return await this.usersRepository.save(user);
   }
 }
