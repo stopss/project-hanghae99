@@ -4,7 +4,6 @@ import { Module, forwardRef } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { AuthService } from './auth.service';
 import { PassportModule } from '@nestjs/passport';
-// import { LocalStrategy } from './jwt/local.strategy';
 import { JwtModule } from '@nestjs/jwt';
 import { LoginUserDto } from './dto/login.request.dto';
 import { KaKaoStrategy } from './strategy/kakao.strategy';
@@ -24,7 +23,6 @@ import { GoogleStrategy } from './strategy/google.strategy';
   ],
   providers: [
     AuthService,
-    // LocalStrategy,
     LoginUserDto,
     KaKaoStrategy,
     FacebookStrategy,

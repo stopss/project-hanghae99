@@ -25,16 +25,6 @@ export class UsersController {
     private readonly authService: AuthService,
   ) {}
 
-  @Get()
-  getUser(): string {
-    return 'user api';
-  }
-
-  @Get('/all')
-  getAllUser() {
-    return this.usersService.findAll();
-  }
-
   @Post('/signup')
   signup(@Body(new ValidationPipe()) body: SignupUserDto) {
     return this.usersService.signup(body);
