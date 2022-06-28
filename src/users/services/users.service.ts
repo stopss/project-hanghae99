@@ -24,8 +24,13 @@ export class UsersService {
     },
   ];
 
-  async findOne(nickname: string) {
-    return this.users.find((user) => user.nickname === nickname);
+  async findUserByEmail(email: string) {
+    try {
+      const result = await this.usersRepository.findOne({ where: { email } });
+      return result;
+    } catch (error) {
+      throw new HttpException('존재하지 않는 이메일입니다.', 401);
+    }
   }
 
   async findAll() {
@@ -50,5 +55,9 @@ export class UsersService {
     user.token = token;
     user.social = social;
     return await this.usersRepository.save(user);
+  }
+
+  async login(body) {
+    return body;
   }
 }
