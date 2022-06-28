@@ -56,8 +56,4 @@ export class UsersService {
     user.social = social;
     return await this.usersRepository.save(user);
   }
-
-  async login(body) {
-    return body;
-  }
 }

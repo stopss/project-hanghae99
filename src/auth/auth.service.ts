@@ -30,7 +30,13 @@ export class AuthService {
         '이메일 혹은 비밀번호를 다시 확인해주세요.',
       );
     }
-    const payload = { email: email, sub: user.id };
+    const payload = {
+      email: email,
+      sub: user.id,
+      nickname: user.nickname,
+      token: user.token,
+      social: user.social,
+    };
     return {
       token: this.jwtService.sign(payload),
     };
