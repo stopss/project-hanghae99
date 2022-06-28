@@ -87,4 +87,18 @@ export class UsersController {
   naverLoginCallback(@Req() req): string {
     return req.user;
   }
+
+  @Get('/google')
+  @HttpCode(200)
+  @UseGuards(AuthGuard('google'))
+  async googleLogin() {
+    return HttpStatus.OK;
+  }
+
+  @Get('/google/redirect')
+  @HttpCode(200)
+  @UseGuards(AuthGuard('google'))
+  googleLoginCallback(@Req() req): string {
+    return req.user;
+  }
 }

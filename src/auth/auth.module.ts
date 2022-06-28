@@ -10,6 +10,7 @@ import { LoginUserDto } from './dto/login.request.dto';
 import { KaKaoStrategy } from './strategy/kakao.strategy';
 import { FacebookStrategy } from './strategy/facebook.strategy';
 import { NaverStrategy } from './strategy/naver.strategy';
+import { GoogleStrategy } from './strategy/google.strategy';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { NaverStrategy } from './strategy/naver.strategy';
     KaKaoStrategy,
     FacebookStrategy,
     NaverStrategy,
+    GoogleStrategy,
   ],
   exports: [AuthService, LoginUserDto],
 })
