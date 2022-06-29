@@ -19,4 +19,7 @@ export class UserEntity {
 
   @Column()
   social: boolean;
+
+  @Column({ nullable: true })
+  imageUrl: string;
 }

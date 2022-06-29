@@ -13,6 +13,7 @@ import {
 } from '@nestjs/common';
 import { SignupUserDto } from '../dto/signup.request.dto';
 import { LoginUserDto } from 'src/auth/dto/login.request.dto';
+import { ImageRegisterDto } from '../dto/image.request.dto';
 
 @Controller('api')
 @UseFilters(new HttpExceptionFilter())
@@ -32,25 +33,23 @@ export class UsersController {
     return this.authService.jwtLogin(body);
   }
 
-  /** TODO: 아래 내용 API 만들기*/
-
   @Post('/login')
   socialLogin(@Body() body) {
     return this.usersService.socialSignup(body);
   }
 
-  @Put('/mypage/update')
-  mypageUpdate(@Body() body) {
-    return 'mypage update api';
+  @Put('/mypage/:id/update')
+  mypageUpdate(@Body() body, @Param('id') id: string) {
+    return this.usersService.userUpdate(parseInt(id), body);
   }
 
-  @Get('/mypage')
-  mypage() {
-    return 'mypage api';
+  @Get('/mypage/:id')
+  mypage(@Param('id') id: string) {
+    return this.usersService.getUser(parseInt(id));
   }
 
-  @Post('/mypage/:userId/image')
-  imageRegister(@Param() userId: string) {
-    return userId;
+  @Put('/mypage/:id/image')
+  imageRegister(@Param('id') id: string, @Body() body: ImageRegisterDto) {
+    return this.usersService.image(parseInt(id), body);
   }
 }
