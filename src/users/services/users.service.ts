@@ -11,19 +11,6 @@ export class UsersService {
     private readonly usersRepository: Repository<UserEntity>,
   ) {}
 
-  private readonly users = [
-    {
-      userId: 1,
-      nickname: 'jin',
-      password: '123',
-    },
-    {
-      userId: 2,
-      nickname: 'nwnp',
-      password: '123',
-    },
-  ];
-
   async findUserByEmail(email: string) {
     try {
       const result = await this.usersRepository.findOne({ where: { email } });
@@ -33,18 +20,28 @@ export class UsersService {
     }
   }
 
-  async findAll() {
-    return this.usersRepository.find();
+  async findUserByNickname(nickname: string): Promise<any> {
+    const result = await this.usersRepository.findOne({
+      where: { nickname },
+    });
+    return result;
   }
 
   async signup(body: SignupUserDto): Promise<any> {
     const user = new UserEntity();
-    const { nickname, email, password, token, social } = body;
+    const { nickname, email, password, passwordCheck } = body;
     const userExist = await this.usersRepository.find({ where: { email } });
+    const isExistNickname = await this.findUserByNickname(nickname);
+    const social = false;
 
-    if (userExist.length !== 0) {
+    if (userExist.length !== 0)
       throw new HttpException('이미 존재하는 이메일입니다.', 400);
-    }
+
+    if (password !== passwordCheck)
+      throw new HttpException('비밀번호를 다시 확인해주세요.', 400);
+
+    if (isExistNickname !== null)
+      throw new HttpException('이미 존재하는 닉네임입니다.', 400);
 
     const saltOrRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltOrRounds);
@@ -52,8 +49,14 @@ export class UsersService {
     user.nickname = nickname;
     user.email = email;
     user.password = hashedPassword;
-    user.token = token;
     user.social = social;
-    return await this.usersRepository.save(user);
+    user.refreshToken = null;
+    const result = await this.usersRepository.save(user);
+    return result;
+  }
+
+  async socialSignup(body) {
+    const result = { result: { success: true, ...body } };
+    return result;
   }
 }

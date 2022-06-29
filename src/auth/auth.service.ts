@@ -34,7 +34,7 @@ export class AuthService {
       email: email,
       sub: user.id,
       nickname: user.nickname,
-      token: user.token,
+      token: user.refreshToken,
       social: user.social,
     };
     return {

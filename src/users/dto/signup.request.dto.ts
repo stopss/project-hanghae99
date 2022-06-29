@@ -11,8 +11,5 @@ export class SignupUserDto {
   password: string;
 
   @IsString()
-  token: string;
-
-  @IsString()
-  social: string;
+  passwordCheck: string;
 }

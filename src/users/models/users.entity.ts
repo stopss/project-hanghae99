@@ -5,7 +5,7 @@ export class UserEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ unique: true })
   nickname: string;
 
   @Column()
@@ -14,9 +14,9 @@ export class UserEntity {
   @Column()
   password: string;
 
-  @Column()
-  token: string;
+  @Column({ nullable: true })
+  refreshToken: string;
 
   @Column()
-  social: string;
+  social: boolean;
 }

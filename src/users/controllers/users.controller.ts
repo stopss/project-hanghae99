@@ -4,20 +4,14 @@ import { HttpExceptionFilter } from '../../common/exceptions/http-exception.filt
 import {
   Body,
   Controller,
-  Get,
-  HttpCode,
-  HttpStatus,
   Post,
-  Req,
   UseFilters,
-  UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
 import { SignupUserDto } from '../dto/signup.request.dto';
 import { LoginUserDto } from 'src/auth/dto/login.request.dto';
-import { AuthGuard } from '@nestjs/passport';
 
-@Controller('users')
+@Controller('api')
 @UseFilters(new HttpExceptionFilter())
 export class UsersController {
   constructor(
@@ -30,65 +24,13 @@ export class UsersController {
     return this.usersService.signup(body);
   }
 
-  @Post('/login')
+  @Post('/local/login')
   login(@Body() body: LoginUserDto) {
     return this.authService.jwtLogin(body);
   }
 
-  @Get('/kakao')
-  @HttpCode(200)
-  @UseGuards(AuthGuard('kakao'))
-  async kakaoLogin() {
-    return HttpStatus.OK;
-  }
-
-  @Get('/kakao/redirect')
-  @HttpCode(200)
-  @UseGuards(AuthGuard('kakao'))
-  // async kakaoLoginCallback(@Req() req): Promise<{ accessToken: string }> {
-  kakaoLoginCallback(@Req() req): string {
-    return req.user;
-  }
-
-  @Get('/facebook')
-  @HttpCode(200)
-  @UseGuards(AuthGuard('facebook'))
-  async facebookLogin() {
-    return HttpStatus.OK;
-  }
-
-  @Get('/facebook/redirect')
-  @HttpCode(200)
-  @UseGuards(AuthGuard('facebook'))
-  facebookLoginCallback(@Req() req): string {
-    return req.user;
-  }
-
-  @Get('/naver')
-  @HttpCode(200)
-  @UseGuards(AuthGuard('naver'))
-  async naverLogin() {
-    return HttpStatus.OK;
-  }
-
-  @Get('/naver/redirect')
-  @HttpCode(200)
-  @UseGuards(AuthGuard('naver'))
-  naverLoginCallback(@Req() req): string {
-    return req.user;
-  }
-
-  @Get('/google')
-  @HttpCode(200)
-  @UseGuards(AuthGuard('google'))
-  async googleLogin() {
-    return HttpStatus.OK;
-  }
-
-  @Get('/google/redirect')
-  @HttpCode(200)
-  @UseGuards(AuthGuard('google'))
-  googleLoginCallback(@Req() req): string {
-    return req.user;
+  @Post('/login')
+  socialLogin(@Body() body) {
+    return this.usersService.socialSignup(body);
   }
 }

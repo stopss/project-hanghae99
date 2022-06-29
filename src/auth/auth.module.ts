@@ -6,10 +6,6 @@ import { AuthService } from './auth.service';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { LoginUserDto } from './dto/login.request.dto';
-import { KaKaoStrategy } from './strategy/kakao.strategy';
-import { FacebookStrategy } from './strategy/facebook.strategy';
-import { NaverStrategy } from './strategy/naver.strategy';
-import { GoogleStrategy } from './strategy/google.strategy';
 
 @Module({
   imports: [
@@ -21,14 +17,7 @@ import { GoogleStrategy } from './strategy/google.strategy';
       signOptions: { expiresIn: '1y' },
     }),
   ],
-  providers: [
-    AuthService,
-    LoginUserDto,
-    KaKaoStrategy,
-    FacebookStrategy,
-    NaverStrategy,
-    GoogleStrategy,
-  ],
+  providers: [AuthService, LoginUserDto],
   exports: [AuthService, LoginUserDto],
 })
 export class AuthModule {}
