@@ -21,42 +21,67 @@ export class UsersService {
   }
 
   async findUserByNickname(nickname: string): Promise<any> {
-    const result = await this.usersRepository.findOne({
-      where: { nickname },
-    });
-    return result;
+    try {
+      const result = await this.usersRepository.findOne({
+        where: { nickname },
+      });
+      return result;
+    } catch (error) {
+      throw new HttpException('서버 에러', 500);
+    }
   }
 
   async signup(body: SignupUserDto): Promise<any> {
-    const user = new UserEntity();
-    const { nickname, email, password, passwordCheck } = body;
-    const userExist = await this.usersRepository.find({ where: { email } });
-    const isExistNickname = await this.findUserByNickname(nickname);
-    const social = false;
+    try {
+      const user = new UserEntity();
+      const { nickname, email, password, passwordCheck } = body;
+      const userExist = await this.usersRepository.find({ where: { email } });
+      const isExistNickname = await this.findUserByNickname(nickname);
+      const social = false;
 
-    if (userExist.length !== 0)
-      throw new HttpException('이미 존재하는 이메일입니다.', 400);
+      if (userExist.length !== 0)
+        throw new HttpException('이미 존재하는 이메일입니다.', 400);
 
-    if (password !== passwordCheck)
-      throw new HttpException('비밀번호를 다시 확인해주세요.', 400);
+      if (password !== passwordCheck)
+        throw new HttpException('비밀번호를 다시 확인해주세요.', 400);
 
-    if (isExistNickname !== null)
-      throw new HttpException('이미 존재하는 닉네임입니다.', 400);
+      if (isExistNickname !== null)
+        throw new HttpException('이미 존재하는 닉네임입니다.', 400);
 
-    const saltOrRounds = 10;
-    const hashedPassword = await bcrypt.hash(password, saltOrRounds);
+      const saltOrRounds = 10;
+      const hashedPassword = await bcrypt.hash(password, saltOrRounds);
 
-    user.nickname = nickname;
-    user.email = email;
-    user.password = hashedPassword;
-    user.social = social;
-    user.refreshToken = null;
-    const result = await this.usersRepository.save(user);
-    return result;
+      user.nickname = nickname;
+      user.email = email;
+      user.password = hashedPassword;
+      user.social = social;
+      user.refreshToken = null;
+      const newUser = await this.usersRepository.save(user);
+      return { result: { success: true, ...newUser } };
+    } catch (error) {
+      throw new HttpException('서버 에러', 500);
+    }
   }
 
   async socialSignup(body) {
-    const result = { result: { success: true, ...body } };
-    return result;
+    try {
+      const user = new UserEntity();
+      const { email, nickname, refreshToken } = body;
+      // const userExist = await this.usersRepository.find({ where: { email } });
+
+      // if (userExist.length !== 0) {
+      //   await this.usersRepository.delete({ email });
+      // }
+
+      user.email = email;
+      user.nickname = nickname;
+      user.refreshToken = refreshToken;
+      user.social = true;
+      const newUser = await this.usersRepository.save(user);
+      const result = { result: { success: true, ...newUser } };
+      return result;
+    } catch (error) {
+      throw new HttpException('서버 에러', 500);
+    }
   }
 }
