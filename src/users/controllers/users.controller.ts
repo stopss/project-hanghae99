@@ -4,7 +4,10 @@ import { HttpExceptionFilter } from '../../common/exceptions/http-exception.filt
 import {
   Body,
   Controller,
+  Get,
+  Param,
   Post,
+  Put,
   UseFilters,
   ValidationPipe,
 } from '@nestjs/common';
@@ -29,8 +32,25 @@ export class UsersController {
     return this.authService.jwtLogin(body);
   }
 
+  /** TODO: 아래 내용 API 만들기*/
+
   @Post('/login')
   socialLogin(@Body() body) {
     return this.usersService.socialSignup(body);
+  }
+
+  @Put('/mypage/update')
+  mypageUpdate(@Body() body) {
+    return 'mypage update api';
+  }
+
+  @Get('/mypage')
+  mypage() {
+    return 'mypage api';
+  }
+
+  @Post('/mypage/:userId/image')
+  imageRegister(@Param() userId: string) {
+    return userId;
   }
 }

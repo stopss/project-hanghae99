@@ -67,20 +67,22 @@ export class UsersService {
     try {
       const user = new UserEntity();
       const { email, nickname, refreshToken } = body;
-      // const userExist = await this.usersRepository.find({ where: { email } });
-
-      // if (userExist.length !== 0) {
-      //   await this.usersRepository.delete({ email });
-      // }
-
+      const userExist = await this.usersRepository.find({ where: { email } });
+      if (userExist.length !== 0) {
+        const temp = { ...userExist[0] };
+        await this.usersRepository.update({ email }, { refreshToken });
+        return { result: { success: true, ...temp } };
+      }
       user.email = email;
       user.nickname = nickname;
       user.refreshToken = refreshToken;
       user.social = true;
+      user.password = null;
       const newUser = await this.usersRepository.save(user);
       const result = { result: { success: true, ...newUser } };
       return result;
     } catch (error) {
+      console.error(error);
       throw new HttpException('서버 에러', 500);
     }
   }
