@@ -83,7 +83,6 @@ export class UsersService {
       if (userExist.length !== 0) {
         await this.usersRepository.update({ email }, { refreshToken });
         const user = await this.findUserByEmail(email);
-        console.log(user);
         const payload = {
           id: user.id,
           email: user.email,
