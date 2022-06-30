@@ -1,3 +1,4 @@
+import { RoomEntity } from 'src/rooms/models/rooms.entity';
 import { UserEntity } from 'src/users/models/users.entity';
 import { DataSource } from 'typeorm';
 export const databaseProviders = [
@@ -11,7 +12,11 @@ export const databaseProviders = [
         username: process.env.DATABASE_USERNAME,
         password: process.env.DATABASE_PASSWORD,
         database: process.env.DATABASE,
-        entities: [__dirname + '/../**/*.entity{.ts,.js}', UserEntity],
+        entities: [
+          __dirname + '/../**/*.entity{.ts,.js}',
+          UserEntity,
+          RoomEntity,
+        ],
         synchronize: true,
       });
       return dataSource.initialize();
