@@ -13,21 +13,16 @@ import { RoomEntity } from '../models/rooms.entity';
 export class RoomsService {
   constructor(
     @Inject('ROOM_REPOSITORY')
-    private readonly roomsRepository: Repository<RoomEntity>
+    private readonly roomsRepository: Repository<RoomEntity>,
   ) {}
 
   async findRoomById(id: number): Promise<any> {
-    try {
-      const result = await this.roomsRepository.findOne({ where: { id } });
-      // if (!result) {
-      //   throw new NotFoundException('존재하지 않는 방입니다.');
-      //   return;
-      // }
-
-      return result;
-    } catch (error) {
-      throw new HttpException('서버 에러', 500);
+    const result = await this.roomsRepository.findOne({ where: { id } });
+    if (!result) {
+      throw new NotFoundException('존재하지 않는 방입니다.');
     }
+
+    return result;
   }
 
   // 방 만들기
@@ -65,5 +60,23 @@ export class RoomsService {
 
     await this.roomsRepository.update(id, body);
     return { result: { success: true } };
+  }
+
+  // 방 삭제하기
+  async deleteRoom(id: number) {
+    const existRoom = await this.findRoomById(id);
+    if (!existRoom) {
+      throw new HttpException('존재하지 않는 방입니다.', 401);
+    }
+
+    await this.roomsRepository.delete(id);
+
+    return { result: { success: true } };
+  }
+
+  // 방 목록
+  async getAllRoom(): Promise<any> {
+    const roomList = await this.roomsRepository.find();
+    return { result: { roomList } };
   }
 }
