@@ -6,28 +6,29 @@ import {
 } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { CreateRoomDto } from '../dto/create.room.dto';
+import { UpdateRoomDto } from '../dto/update.room.dto';
 import { RoomEntity } from '../models/rooms.entity';
 
 @Injectable()
 export class RoomsService {
   constructor(
     @Inject('ROOM_REPOSITORY')
-    private readonly roomsRepository: Repository<RoomEntity>,
+    private readonly roomsRepository: Repository<RoomEntity>
   ) {}
 
-  // async findRoomById(id: number): Promise<Room> {
-  //   try {
-  //     const result = await this.roomsRepository.findOne({ where: { id } });
+  async findRoomById(id: number): Promise<any> {
+    try {
+      const result = await this.roomsRepository.findOne({ where: { id } });
+      // if (!result) {
+      //   throw new NotFoundException('존재하지 않는 방입니다.');
+      //   return;
+      // }
 
-  //     if (!result) {
-  //       throw new NotFoundException('존재하지 않는 방입니다.');
-  //     }
-
-  //     return result;
-  //   } catch (error) {3
-  //     throw new HttpException('서버 에러', 500);
-  //   }
-  // }
+      return result;
+    } catch (error) {
+      throw new HttpException('서버 에러', 500);
+    }
+  }
 
   // 방 만들기
   async createRoom(body: CreateRoomDto): Promise<any> {
@@ -45,6 +46,7 @@ export class RoomsService {
       room.master = master;
 
       const newRoom = await this.roomsRepository.save(room);
+
       return {
         result: { success: true, master: newRoom.master, roomId: newRoom.id },
       };
@@ -53,6 +55,15 @@ export class RoomsService {
     }
   }
 
-  
+  // 방 수정하기
+  async updateRoom(id: number, body: UpdateRoomDto) {
+    console.log('수정');
+    const existRoom = await this.findRoomById(id);
+    if (!existRoom) {
+      throw new HttpException('존재하지 않는 방입니다.', 401);
+    }
 
+    await this.roomsRepository.update(id, body);
+    return { result: { success: true } };
+  }
 }
