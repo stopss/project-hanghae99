@@ -5,9 +5,10 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { LoggerMiddleware } from './common/middelwares/logger.middleware';
 import { UsersModule } from './users/users.module';
+import { RoomsModule } from './rooms/rooms.module';
 
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true }), AuthModule, UsersModule],
+  imports: [ConfigModule.forRoot({ isGlobal: true }), AuthModule, UsersModule, RoomsModule],
   controllers: [AppController],
   providers: [AppService],
 })
