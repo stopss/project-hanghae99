@@ -6,13 +6,14 @@ import { AuthModule } from './auth/auth.module';
 import { ChatsModule } from './chats/chats.module';
 import { LoggerMiddleware } from './common/middelwares/logger.middleware';
 import { UsersModule } from './users/users.module';
+import { RoomsModule } from './rooms/rooms.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     AuthModule,
     UsersModule,
-    ChatsModule,
+    RoomsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
