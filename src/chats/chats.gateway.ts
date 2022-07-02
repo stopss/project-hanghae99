@@ -1,4 +1,5 @@
-import { Logger } from '@nestjs/common';
+import { JwtAuthGuard } from './../auth/jwt/jwt.guard';
+import { ChatService } from './chats.gateway.service';
 import {
   ConnectedSocket,
   MessageBody,
@@ -8,28 +9,42 @@ import {
   WebSocketGateway,
 } from '@nestjs/websockets';
 import { Socket } from 'socket.io';
+import { ChatDto } from './dto/chat.dto';
+import { Req, UseGuards } from '@nestjs/common';
+import { CreateRoomDto } from './dto/create.room.dto';
 
 @WebSocketGateway({ namespace: 'chattings' })
+@UseGuards(JwtAuthGuard)
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
-  private logger = new Logger('CHATTING');
+  constructor(private readonly chatService: ChatService) {}
 
-  handleConnection(
-    @ConnectedSocket()
-    socket: Socket,
-  ) {
-    this.logger.log(`connected: ${socket.id}`);
-  }
-
-  @SubscribeMessage('submit_chat')
-  handleSubmitChat(
-    @MessageBody() chat: string,
-    @ConnectedSocket() socket: Socket,
-  ) {
-    socket.broadcast.emit('new_chat', { chat });
-    return chat;
+  handleConnection(@ConnectedSocket() socket: Socket) {
+    return this.chatService.connection(socket);
   }
 
   handleDisconnect(@ConnectedSocket() socket: Socket) {
-    this.logger.log(`disconnected: ${socket.id}`);
+    return this.chatService.disconnection(socket);
+  }
+
+  @SubscribeMessage('submit_chat') handleSubmitChat(
+    @MessageBody() chat: ChatDto,
+    @ConnectedSocket() socket: Socket,
+  ) {
+    return this.chatService.chats(chat, socket);
+  }
+
+  @SubscribeMessage('room_list')
+  handleRoomList(@ConnectedSocket() socket: Socket) {
+    return this.chatService.roomList(socket);
+  }
+
+  @SubscribeMessage('create_room')
+  handleCreateRoom(
+    @ConnectedSocket() socket: Socket,
+    @Req() req,
+    roomData: CreateRoomDto,
+  ) {
+    const master = req.user.nickname;
+    return this.chatService.create(socket, master, roomData);
   }
 }

@@ -2,19 +2,24 @@ const socket = io('/chattings');
 
 const getElementById = (id) => document.getElementById(id) || null;
 const chattingBoxElement = getElementById('chatting_box');
-const formElement = getElementById('chat_form');
+const formElement1 = getElementById('chat_form');
+const formElement2 = getElementById('join_room');
 
 socket.on('new_chat', (data) => {
-  const { chat } = data;
-  console.log(chat);
-  drawChat(chat);
+  const { message } = data;
+  drawChat(message);
 });
 
 const handleSubmit = (event) => {
   event.preventDefault();
-  const inputValue = event.target.elements[0].value;
-  socket.emit('submit_chat', inputValue);
-  drawChat(inputValue, true);
+  const message = event.target.elements[0].value;
+  const url = '/rooms/11'; // /api/rooms/:roomId
+  const payload = {
+    message,
+    url,
+  };
+  socket.emit('submit_chat', payload);
+  drawChat(message, true);
   event.target.elements[0].value = '';
 };
 
@@ -30,8 +35,14 @@ const drawChat = (chat, bool = false) => {
   chattingBoxElement.append(wrapperChatBox);
 };
 
+const joinTheRoom = (event) => {
+  event.preventDefault();
+  console.log('join the room');
+};
+
 function init() {
-  formElement.addEventListener('submit', handleSubmit);
+  formElement1.addEventListener('submit', handleSubmit);
+  formElement2.addEventListener('submit', joinTheRoom);
 }
 
 init();
