@@ -3,14 +3,15 @@ import {
   ConnectedSocket,
   MessageBody,
   OnGatewayConnection,
+  OnGatewayDisconnect,
   SubscribeMessage,
   WebSocketGateway,
 } from '@nestjs/websockets';
 import { Socket } from 'socket.io';
 
 @WebSocketGateway({ namespace: 'chattings' })
-export class ChatGateway implements OnGatewayConnection {
-  private logger = new Logger('chat');
+export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
+  private logger = new Logger('CHATTING');
 
   handleConnection(
     @ConnectedSocket()
@@ -24,7 +25,11 @@ export class ChatGateway implements OnGatewayConnection {
     @MessageBody() chat: string,
     @ConnectedSocket() socket: Socket,
   ) {
-    console.log('front -> back:', chat);
     socket.broadcast.emit('new_chat', { chat });
+    return chat;
+  }
+
+  handleDisconnect(@ConnectedSocket() socket: Socket) {
+    this.logger.log(`disconnected: ${socket.id}`);
   }
 }

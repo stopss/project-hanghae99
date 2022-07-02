@@ -1,4 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { CurrentUserEntity } from 'src/current/current.users.entity';
+import { RoomEntity } from 'src/rooms/models/rooms.entity';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('User')
 export class UserEntity {
@@ -22,4 +24,10 @@ export class UserEntity {
 
   @Column({ nullable: true })
   imageUrl: string;
+
+  @OneToMany(() => RoomEntity, (rooms) => rooms.user)
+  rooms: RoomEntity;
+
+  @OneToMany(() => CurrentUserEntity, (currentusers) => currentusers.user)
+  users: CurrentUserEntity;
 }

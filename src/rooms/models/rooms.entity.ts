@@ -1,4 +1,12 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { CurrentUserEntity } from 'src/current/current.users.entity';
+import { UserEntity } from 'src/users/models/users.entity';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity('Room')
 export class RoomEntity {
@@ -25,4 +33,10 @@ export class RoomEntity {
 
   @Column()
   isRandom: string;
+
+  @ManyToOne(() => UserEntity, (user) => user.rooms)
+  user: UserEntity;
+
+  @OneToMany(() => CurrentUserEntity, (currentusers) => currentusers.room)
+  rooms: CurrentUserEntity;
 }

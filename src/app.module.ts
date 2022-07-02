@@ -7,6 +7,7 @@ import { ChatsModule } from './chats/chats.module';
 import { LoggerMiddleware } from './common/middelwares/logger.middleware';
 import { UsersModule } from './users/users.module';
 import { RoomsModule } from './rooms/rooms.module';
+import { CurrentUsersModule } from './current/current.users.module';
 
 @Module({
   imports: [
@@ -14,6 +15,8 @@ import { RoomsModule } from './rooms/rooms.module';
     AuthModule,
     UsersModule,
     RoomsModule,
+    ChatsModule,
+    CurrentUsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
