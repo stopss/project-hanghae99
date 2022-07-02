@@ -1,6 +1,14 @@
+import { EpisodeEntity } from 'src/episode/episode.entity';
+import { ImageEntity } from 'src/images/images.entity';
 import { RoomEntity } from 'src/rooms/models/rooms.entity';
 import { UserEntity } from 'src/users/models/users.entity';
-import { Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity('CurrentUser')
 export class CurrentUserEntity {
@@ -12,4 +20,12 @@ export class CurrentUserEntity {
 
   @ManyToOne(() => RoomEntity, (room) => room.rooms)
   room: RoomEntity;
+
+  @OneToOne(() => EpisodeEntity)
+  @JoinColumn()
+  episode: EpisodeEntity;
+
+  @OneToOne(() => ImageEntity)
+  @JoinColumn()
+  imageUrl: ImageEntity;
 }
