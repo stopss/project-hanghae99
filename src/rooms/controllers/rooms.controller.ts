@@ -1,3 +1,4 @@
+import { JwtAuthGuard } from './../../auth/jwt/jwt.guard';
 import {
   Body,
   Controller,
@@ -6,18 +7,22 @@ import {
   Param,
   Post,
   Put,
+  Req,
+  UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
 import { CreateRoomDto } from '../dto/create.room.dto';
 import { RoomsService } from '../services/rooms.service';
 
 @Controller('api')
+@UseGuards(JwtAuthGuard)
 export class RoomsController {
   constructor(private readonly roomsService: RoomsService) {}
 
   @Post('/room/create')
-  roomCreate(@Body() body: CreateRoomDto) {
-    return this.roomsService.createRoom(body);
+  roomCreate(@Body() body: CreateRoomDto, @Req() req) {
+    const master = req.user.nickname;
+    return this.roomsService.createRoom(body, master);
   }
 
   @Put('/room/update/:roomId')

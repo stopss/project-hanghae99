@@ -26,12 +26,10 @@ export class RoomsService {
   }
 
   // 방 만들기
-  async createRoom(body: CreateRoomDto): Promise<any> {
+  async createRoom(body: CreateRoomDto, master: string): Promise<any> {
     try {
       const room = new RoomEntity();
       const { title, password, hintTime, reasoningTime, isRandom } = body;
-      const master = 'userId';
-
       room.title = title;
       room.password = password;
       room.count = 1;

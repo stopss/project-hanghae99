@@ -6,6 +6,7 @@ import { AuthService } from './auth.service';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { LoginUserDto } from './dto/login.request.dto';
+import { JwtStrategy } from './jwt/jwt.strategy';
 
 @Module({
   imports: [
@@ -17,7 +18,7 @@ import { LoginUserDto } from './dto/login.request.dto';
       signOptions: { expiresIn: '1y' },
     }),
   ],
-  providers: [AuthService, LoginUserDto],
+  providers: [AuthService, LoginUserDto, JwtStrategy],
   exports: [AuthService, LoginUserDto],
 })
 export class AuthModule {}
