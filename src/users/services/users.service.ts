@@ -1,3 +1,4 @@
+import { UpdateUserDto } from './../dto/update.request.dto';
 import { JwtService } from '@nestjs/jwt';
 import { Inject, Injectable, HttpException } from '@nestjs/common';
 import { Repository } from 'typeorm';
@@ -124,9 +125,17 @@ export class UsersService {
     }
   }
 
-  async userUpdate(id: number, user: object) {
-    const existUser = await this.findUserById(id);
-    if (!existUser) throw new HttpException('존재하지 않는 회원입니다.', 401);
+  async userUpdate(id: number, updatedData: UpdateUserDto) {
+    const { password, nickname, imageUrl } = updatedData;
+    const user = new UserEntity();
+    const saltOrRounds = parseInt(process.env.BCRYPT_ROUND_OR_SALT);
+    const hashedPassword = await bcrypt.hash(password, saltOrRounds);
+    const isExistNickname = await this.findUserByNickname(nickname);
+    if (isExistNickname)
+      throw new HttpException('이미 존재하는 닉네임입니다.', 400);
+    user.nickname = nickname;
+    user.imageUrl = imageUrl;
+    user.password = hashedPassword;
     await this.usersRepository.update(id, user);
     return { result: { success: true } };
   }

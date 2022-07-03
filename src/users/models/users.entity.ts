@@ -19,7 +19,7 @@ export class UserEntity {
   @Column({ nullable: true })
   refreshToken: string;
 
-  @Column()
+  @Column({ nullable: true })
   social: boolean;
 
   @Column({ nullable: true })
