@@ -1,3 +1,4 @@
+import { CurrentUsersService } from './../../current/services/current.service';
 import { UpdateUserDto } from './../dto/update.request.dto';
 import { JwtService } from '@nestjs/jwt';
 import { Inject, Injectable, HttpException } from '@nestjs/common';
@@ -13,6 +14,7 @@ export class UsersService {
     @Inject('USER_REPOSITORY')
     private readonly usersRepository: Repository<UserEntity>,
     private readonly jwtService: JwtService,
+    private readonly currentUsersService: CurrentUsersService,
   ) {}
 
   async findUserByEmail(email: string) {
@@ -117,12 +119,8 @@ export class UsersService {
   }
 
   async getUser(id: number) {
-    try {
-      const result = await this.findUserById(id);
-      return { result: { success: true, ...result } };
-    } catch (error) {
-      throw new HttpException('서버 에러', 500);
-    }
+    const result = await this.currentUsersService.getLog(id);
+    return { result: { success: true, ...result } };
   }
 
   async userUpdate(id: number, updatedData: UpdateUserDto) {

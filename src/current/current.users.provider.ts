@@ -3,7 +3,7 @@ import { CurrentUserEntity } from './current.users.entity';
 
 export const CurrentUsersProviders = [
   {
-    provide: 'ROOM_REPOSITORY',
+    provide: 'CURRENT_REPOSITORY',
     useFactory: (dataSource: DataSource) =>
       dataSource.getRepository(CurrentUserEntity),
     inject: ['DATA_SOURCE'],

@@ -1,3 +1,4 @@
+import { CurrentUsersModule } from './../current/current.users.module';
 import { DatabaseModule } from './../common/database/database.module';
 import { forwardRef, Module } from '@nestjs/common';
 import { UsersController } from './controllers/users.controller';
@@ -10,6 +11,7 @@ import { jwtConstants } from 'src/auth/jwt/constants';
 @Module({
   imports: [
     DatabaseModule,
+    CurrentUsersModule,
     forwardRef(() => AuthModule),
     JwtModule.register({
       secret: jwtConstants.secret,
