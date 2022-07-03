@@ -5,15 +5,17 @@ import {
   Body,
   Controller,
   Get,
-  Param,
   Post,
   Put,
+  Req,
   UseFilters,
+  UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
 import { SignupUserDto } from '../dto/signup.request.dto';
 import { LoginUserDto } from 'src/auth/dto/login.request.dto';
 import { ImageRegisterDto } from '../dto/image.request.dto';
+import { JwtAuthGuard } from 'src/auth/jwt/jwt.guard';
 
 @Controller('api')
 @UseFilters(new HttpExceptionFilter())
@@ -38,18 +40,21 @@ export class UsersController {
     return this.usersService.socialSignup(body);
   }
 
-  @Put('/mypage/:id/update')
-  mypageUpdate(@Body() body, @Param('id') id: string) {
-    return this.usersService.userUpdate(parseInt(id), body);
+  @Put('/mypage/update')
+  @UseGuards(JwtAuthGuard)
+  mypageUpdate(@Body() body, @Req() req) {
+    return this.usersService.userUpdate(req.user.id, body);
   }
 
-  @Get('/mypage/:id')
-  mypage(@Param('id') id: string) {
-    return this.usersService.getUser(parseInt(id));
+  @Get('/mypage')
+  @UseGuards(JwtAuthGuard)
+  mypage(@Req() req) {
+    return this.usersService.getUser(req.user.id);
   }
 
-  @Put('/mypage/:id/image')
-  imageRegister(@Param('id') id: string, @Body() body: ImageRegisterDto) {
-    return this.usersService.image(parseInt(id), body);
+  @Post('/mypage/image')
+  @UseGuards(JwtAuthGuard)
+  imageRegister(@Req() req, @Body() body: ImageRegisterDto) {
+    return this.usersService.image(req.user.id, body);
   }
 }
