@@ -13,10 +13,13 @@ socket.on('new_chat', (data) => {
 const handleSubmit = (event) => {
   event.preventDefault();
   const message = event.target.elements[0].value;
-  const url = '/rooms/11'; // /api/rooms/:roomId
+  // const url = '/rooms/11'; // /api/rooms/:roomId
   const payload = {
     message,
-    url,
+    userId: 1,
+    roomId: 1,
+    email: 'ujmn0418@gmail.com',
+    nickname: 'helloworld!',
   };
   socket.emit('submit_chat', payload);
   drawChat(message, true);

@@ -34,6 +34,9 @@ export class RoomEntity {
   @Column()
   isRandom: string;
 
+  @Column({ nullable: true })
+  roomUniqueId: string;
+
   @ManyToOne(() => UserEntity, (user) => user.rooms)
   user: UserEntity;
 

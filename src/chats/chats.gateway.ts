@@ -1,4 +1,3 @@
-import { JwtAuthGuard } from './../auth/jwt/jwt.guard';
 import { ChatService } from './chats.gateway.service';
 import {
   ConnectedSocket,
@@ -10,11 +9,11 @@ import {
 } from '@nestjs/websockets';
 import { Socket } from 'socket.io';
 import { ChatDto } from './dto/chat.dto';
-import { Req, UseGuards } from '@nestjs/common';
+import { Req } from '@nestjs/common';
 import { CreateRoomDto } from './dto/create.room.dto';
+import { JoinRoomDto } from './dto/join.room.dto';
 
 @WebSocketGateway({ namespace: 'chattings' })
-@UseGuards(JwtAuthGuard)
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(private readonly chatService: ChatService) {}
 
@@ -46,5 +45,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ) {
     const master = req.user.nickname;
     return this.chatService.create(socket, master, roomData);
+  }
+
+  @SubscribeMessage('join_room')
+  handleJoinRoom(@ConnectedSocket() socket: Socket, data: JoinRoomDto) {
+    return this.chatService.join(socket, data);
   }
 }

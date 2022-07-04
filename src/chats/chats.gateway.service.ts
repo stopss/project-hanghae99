@@ -1,8 +1,10 @@
 import { RoomsService } from './../rooms/services/rooms.service';
 import { Injectable, Logger } from '@nestjs/common';
-import { Socket } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 import { ChatDto } from './dto/chat.dto';
 import { CreateRoomDto } from './dto/create.room.dto';
+import { v4 as uuidv4 } from 'uuid';
+import { JoinRoomDto } from './dto/join.room.dto';
 
 @Injectable()
 export class ChatService {
@@ -18,8 +20,8 @@ export class ChatService {
   }
 
   chats(chat: ChatDto, socket: Socket) {
-    const { message, url } = chat;
-    console.log(url);
+    const { message, email, nickname, userId, roomId } = chat;
+    console.log(message, email, nickname, userId, roomId);
     socket.broadcast.emit('new_chat', { message });
     return message;
   }
@@ -30,7 +32,28 @@ export class ChatService {
   }
 
   async create(socket: Socket, master: string, roomData: CreateRoomDto) {
-    const newRoom = await this.roomsService.createRoom(roomData, master);
-    socket.emit('new_room', newRoom);
+    const roomUniqueId = `${uuidv4()}`;
+    const payload = {
+      title: roomData.title,
+      password: roomData.password,
+      hintTime: roomData.hintTime,
+      reasoningTime: roomData.reasoningTime,
+      isRandom: roomData.isRandom,
+      roomUniqueId,
+    };
+    const newRoom = await this.roomsService.createRoom(payload, master);
+    console.log(newRoom);
+    socket.broadcast.emit('new_room', newRoom);
+  }
+
+  async join(socket: Socket, data: JoinRoomDto) {
+    const { userId, roomId, email, nickname } = data;
+    const existRoom = await this.roomsService.findRoomById(roomId);
+    socket.join(`${existRoom.roomId}`);
+    // await this.roomsService.updateRoom(existRoom.id, );
+    socket.to(`${roomId}`).emit('new_chat', {
+      nickname: `${nickname}`,
+      message: `${nickname}(${email})님이 입장하셨습니다.`,
+    });
   }
 }

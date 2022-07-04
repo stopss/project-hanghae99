@@ -39,9 +39,9 @@ export class RoomsService {
       room.master = master;
 
       const newRoom = await this.roomsRepository.save(room);
-
+      const result = { ...newRoom };
       return {
-        result: { success: true, master: newRoom.master, roomId: newRoom.id },
+        result: { success: true, ...result },
       };
     } catch (error) {
       throw new HttpException('서버 에러', 500);
