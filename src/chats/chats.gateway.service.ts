@@ -1,11 +1,12 @@
 import { UsersService } from './../users/services/users.service';
 import { RoomsService } from './../rooms/services/rooms.service';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, UseFilters } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import { ChatDto } from './dto/chat.dto';
 import { CreateRoomDto } from './dto/create.room.dto';
 import { v4 as uuidv4 } from 'uuid';
 import { JoinRoomDto } from './dto/join.room.dto';
+import { WsException } from '@nestjs/websockets';
 
 @Injectable()
 export class ChatService {
@@ -23,11 +24,13 @@ export class ChatService {
     this.logger.log(`disconnected: ${socket.id}`);
   }
 
-  chats(chat: ChatDto, socket: Socket) {
+  async chats(chat: ChatDto, socket: Socket) {
     const { message, email, nickname, userId, roomId } = chat;
-    console.log(message, email, nickname, userId, roomId);
-    socket.broadcast.emit('new_chat', { message });
-    return message;
+    const room = await this.roomsService.findRoomById(roomId);
+    socket.join(`${room.roomId}`);
+    socket
+      .to(`${room.roomUniqueId}`)
+      .emit('new_chat', { message: `${nickname}: ${message}` });
   }
 
   async roomList(socket: Socket) {
@@ -48,15 +51,20 @@ export class ChatService {
       roomUniqueId,
     };
     const newRoom = await this.roomsService.createRoom(payload, master);
-    socket.broadcast.emit('new_room', newRoom);
+    socket.join(roomUniqueId);
+    socket.emit('new_room', newRoom);
   }
 
   async join(socket: Socket, data: JoinRoomDto) {
     const { userId, roomId, email, nickname } = data;
-    const existRoom = await this.roomsService.findRoomById(roomId);
-    socket.join(`${existRoom.roomId}`);
-    // await this.roomsService.updateRoom(existRoom.id, );
-    socket.to(`${roomId}`).emit('new_chat', {
+    const room = await this.roomsService.findRoomById(roomId);
+    if (room.count === 5) {
+      return new WsException('참가인원이 꽉 찼습니다.');
+    }
+    const count = room.count + 1;
+    await this.roomsService.updateRoom(room.id, count);
+    socket.join(`${room.roomId}`);
+    socket.to(`${room.roomUniqueId}`).emit('new_chat', {
       nickname: `${nickname}`,
       message: `${nickname}(${email})님이 입장하셨습니다.`,
     });
