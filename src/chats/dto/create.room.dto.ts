@@ -1,4 +1,4 @@
-import { IsString } from 'class-validator';
+import { IsString, IsNumber } from 'class-validator';
 
 export class CreateRoomDto {
   @IsString()
@@ -15,4 +15,7 @@ export class CreateRoomDto {
 
   @IsString()
   isRandom: string;
+
+  @IsNumber()
+  userId: number;
 }

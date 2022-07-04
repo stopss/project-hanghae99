@@ -1,3 +1,4 @@
+import { UsersService } from './../users/services/users.service';
 import { RoomsService } from './../rooms/services/rooms.service';
 import { Injectable, Logger } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
@@ -8,7 +9,10 @@ import { JoinRoomDto } from './dto/join.room.dto';
 
 @Injectable()
 export class ChatService {
-  constructor(private readonly roomsService: RoomsService) {}
+  constructor(
+    private readonly roomsService: RoomsService,
+    private readonly usersService: UsersService,
+  ) {}
   private logger = new Logger('CHATTING');
 
   connection(socket: Socket) {
@@ -31,7 +35,9 @@ export class ChatService {
     socket.emit('room_list', roomList);
   }
 
-  async create(socket: Socket, master: string, roomData: CreateRoomDto) {
+  async create(socket: Socket, userId: number, roomData: CreateRoomDto) {
+    const user = await this.usersService.findUserById(userId);
+    const master = user.nickname;
     const roomUniqueId = `${uuidv4()}`;
     const payload = {
       title: roomData.title,
@@ -42,7 +48,6 @@ export class ChatService {
       roomUniqueId,
     };
     const newRoom = await this.roomsService.createRoom(payload, master);
-    console.log(newRoom);
     socket.broadcast.emit('new_room', newRoom);
   }
 
