@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { Entity, Repository } from 'typeorm';
 import { CurrentUserEntity } from '../current.users.entity';
 
 @Injectable()
@@ -24,5 +24,20 @@ export class CurrentUsersService {
       delete users[i].user.password;
     }
     return users[0];
+  }
+
+  async userJoinRoom(userId: number, roomId: number) {
+    const newJoiner = new CurrentUserEntity();
+    newJoiner.roomId = roomId;
+    newJoiner.userId = userId;
+    const result = await this.currentUsersRepository.save(newJoiner);
+    return result;
+  }
+
+  async exitRoom(userId: number) {
+    const user = new CurrentUserEntity();
+    user.userId = userId;
+    const result = await this.currentUsersRepository.delete(user);
+    return result;
   }
 }
