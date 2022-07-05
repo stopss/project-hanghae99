@@ -9,20 +9,20 @@ import {
 } from '@nestjs/websockets';
 import { Socket } from 'socket.io';
 import { ChatDto } from './dto/chat.dto';
-import { Req } from '@nestjs/common';
 import { CreateRoomDto } from './dto/create.room.dto';
 import { JoinRoomDto } from './dto/join.room.dto';
+import { ExitRoomDto } from './dto/exit.room.dto';
 
 @WebSocketGateway({ namespace: 'chattings' })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(private readonly chatService: ChatService) {}
 
   handleConnection(@ConnectedSocket() socket: Socket) {
-    return this.chatService.connection(socket);
+    return this.chatService.connected(socket);
   }
 
   handleDisconnect(@ConnectedSocket() socket: Socket) {
-    return this.chatService.disconnection(socket);
+    return this.chatService.disconnected(socket);
   }
 
   @SubscribeMessage('submit_chat') handleSubmitChat(
@@ -46,5 +46,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('join_room')
   handleJoinRoom(@ConnectedSocket() socket: Socket, data: JoinRoomDto) {
     return this.chatService.join(socket, data);
+  }
+
+  @SubscribeMessage('exit_room')
+  handlExitRoom(@ConnectedSocket() socket: Socket, data: ExitRoomDto) {
+    return this.chatService.exit(socket, data);
   }
 }
