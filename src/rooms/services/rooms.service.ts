@@ -4,8 +4,9 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { CreateRoomDto } from '../dto/create.room.dto';
+import { SearchRoomDto } from '../dto/search.room.dto';
 import { UpdateRoomDto } from '../dto/update.room.dto';
 import { RoomEntity } from '../models/rooms.entity';
 import { v4 as uuidv4 } from 'uuid';
@@ -82,5 +83,26 @@ export class RoomsService {
   async getAllRoom(): Promise<any> {
     const roomList = await this.roomsRepository.find();
     return { result: { roomList } };
+  }
+
+  // 방 찾기
+  async searchRoom(body: SearchRoomDto) {
+    const { type, inputValue } = body;
+    console.log(type, inputValue);
+
+    let roomList;
+    if (type == 'TITLE') {
+      roomList = await this.roomsRepository
+        .createQueryBuilder('Room')
+        .where('Room.title LIKE :title', { title: `%${inputValue}%` })
+        .getMany();
+      console.log(roomList);
+    } else {
+      roomList = await this.roomsRepository
+        .createQueryBuilder('Room')
+        .where('Room.master LIKE :master', { master: `%${inputValue}%` })
+        .getMany();
+    }
+    return { result: { success: true, roomList } };
   }
 }

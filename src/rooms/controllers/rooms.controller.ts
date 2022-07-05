@@ -41,4 +41,9 @@ export class RoomsController {
   roomGetAll(): Promise<any> {
     return this.roomsService.getAllRoom();
   }
+
+  @Get('/room/search')
+  roomSearch(@Body() body) {
+    return this.roomsService.searchRoom(body);
+  }
 }
