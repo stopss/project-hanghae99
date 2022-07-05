@@ -38,9 +38,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('create_room')
-  handleCreateRoom(@ConnectedSocket() socket: Socket, roomData: CreateRoomDto) {
-    const master = roomData.userId;
-    return this.chatService.create(socket, master, roomData);
+  handleCreateRoom(@ConnectedSocket() socket: Socket, roomUniqueId: string) {
+    // const master = roomData.userId;
+    // return this.chatService.create(socket, master, roomData);
+    return this.chatService.create(socket, roomUniqueId);
   }
 
   @SubscribeMessage('join_room')

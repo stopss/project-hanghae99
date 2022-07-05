@@ -40,21 +40,22 @@ export class ChatService {
     socket.emit('room_list', roomList);
   }
 
-  async create(socket: Socket, userId: number, roomData: CreateRoomDto) {
-    const user = await this.usersService.findUserById(userId);
-    const master = user.nickname;
-    const roomUniqueId = `${uuidv4()}`;
-    const payload = {
-      title: roomData.title,
-      password: roomData.password,
-      hintTime: roomData.hintTime,
-      reasoningTime: roomData.reasoningTime,
-      isRandom: roomData.isRandom,
-      roomUniqueId,
-    };
-    const newRoom = await this.roomsService.createRoom(payload, master);
+  // async create(socket: Socket, userId: number, roomData: CreateRoomDto) {
+  async create(socket: Socket, roomUniqueId: string) {
+    // const user = await this.usersService.findUserById(userId);
+    // const master = user.nickname;
+    // const roomUniqueId = `${uuidv4()}`;
+    // const payload = {
+    //   title: roomData.title,
+    //   password: roomData.password,
+    //   hintTime: roomData.hintTime,
+    //   reasoningTime: roomData.reasoningTime,
+    //   isRandom: roomData.isRandom,
+    //   roomUniqueId,
+    // };
+    // const newRoom = await this.roomsService.createRoom(payload, master);
     socket.join(roomUniqueId);
-    socket.emit('new_room', newRoom);
+    socket.emit('new_room', { message: '방을 생성합니다.' });
   }
 
   async join(socket: Socket, data: JoinRoomDto) {

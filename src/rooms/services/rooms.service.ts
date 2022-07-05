@@ -8,6 +8,7 @@ import { Repository } from 'typeorm';
 import { CreateRoomDto } from '../dto/create.room.dto';
 import { UpdateRoomDto } from '../dto/update.room.dto';
 import { RoomEntity } from '../models/rooms.entity';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class RoomsService {
@@ -37,6 +38,7 @@ export class RoomsService {
       room.reasoningTime = reasoningTime;
       room.isRandom = isRandom;
       room.master = master;
+      room.roomUniqueId = uuidv4().toString();
 
       const newRoom = await this.roomsRepository.save(room);
       const result = { ...newRoom };
