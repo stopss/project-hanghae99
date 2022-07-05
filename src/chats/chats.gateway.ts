@@ -9,11 +9,10 @@ import {
 } from '@nestjs/websockets';
 import { Socket } from 'socket.io';
 import { ChatDto } from './dto/chat.dto';
-import { CreateRoomDto } from './dto/create.room.dto';
 import { JoinRoomDto } from './dto/join.room.dto';
 import { ExitRoomDto } from './dto/exit.room.dto';
 
-@WebSocketGateway({ namespace: 'chattings' })
+@WebSocketGateway(3000, { transports: ['websocket'], cors: { origin: '*' } })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(private readonly chatService: ChatService) {}
 
@@ -39,8 +38,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('create_room')
   handleCreateRoom(@ConnectedSocket() socket: Socket, roomUniqueId: string) {
-    // const master = roomData.userId;
-    // return this.chatService.create(socket, master, roomData);
     return this.chatService.create(socket, roomUniqueId);
   }
 
