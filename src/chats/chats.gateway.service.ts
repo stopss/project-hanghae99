@@ -32,7 +32,7 @@ export class ChatService {
     const room = await this.roomsService.findRoomById(roomId);
     socket
       .to(room.roomUniqueId)
-      .emit('new_chat', { message: `${nickname}: ${message}` });
+      .emit('submit_chats', { message: `${nickname}: ${message}` });
   }
 
   async roomList(socket: Socket) {
@@ -42,7 +42,7 @@ export class ChatService {
 
   async create(socket: Socket, roomUniqueId: string) {
     socket.join(roomUniqueId);
-    socket.emit('new_room', { message: '방을 생성합니다.' });
+    socket.emit('create_room', { message: '방을 생성합니다.' });
   }
 
   async join(socket: Socket, data: JoinRoomDto) {
@@ -62,7 +62,7 @@ export class ChatService {
     await this.roomsService.updateRoom(room.id, body);
     await this.currentUsersService.userJoinRoom(userId, room.id);
     socket.join(room.roomUniqueId);
-    socket.to(room.roomUniqueId).emit('new_chat', {
+    socket.to(room.roomUniqueId).emit('submit_chat', {
       message: `${nickname}(${email})님이 입장하셨습니다.`,
     });
   }
@@ -81,8 +81,8 @@ export class ChatService {
       count: parseInt(room.count) - 1,
     };
     await this.roomsService.updateRoom(parseInt(roomId), body);
-    socket
-      .to(room.roomUniqueId)
-      .emit('new_chat', { message: `${exitUser.nickname}님이 퇴장했습니다.` });
+    socket.to(room.roomUniqueId).emit('submit_chat', {
+      message: `${exitUser.nickname}님이 퇴장했습니다.`,
+    });
   }
 }
