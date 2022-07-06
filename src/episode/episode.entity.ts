@@ -1,5 +1,6 @@
 import { IsString } from 'class-validator';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { CurrentUserEntity } from 'src/current/current.users.entity';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('Episode')
 export class EpisodeEntity {
@@ -13,4 +14,7 @@ export class EpisodeEntity {
   @Column()
   @IsString()
   description: string;
+
+  @OneToMany(() => CurrentUserEntity, (currentusers) => currentusers.episode)
+  episodes: CurrentUserEntity;
 }

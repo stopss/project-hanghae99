@@ -1,5 +1,6 @@
 import { IsString } from 'class-validator';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { CurrentUserEntity } from 'src/current/current.users.entity';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('Image')
 export class ImageEntity {
@@ -9,4 +10,7 @@ export class ImageEntity {
   @Column()
   @IsString()
   imageUrl: string;
+
+  @OneToMany(() => CurrentUserEntity, (currentusers) => currentusers.imageUrl)
+  images: CurrentUserEntity;
 }

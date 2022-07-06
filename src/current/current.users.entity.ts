@@ -7,7 +7,6 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
-  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -30,11 +29,11 @@ export class CurrentUserEntity {
   @JoinColumn([{ name: 'roomId', referencedColumnName: 'id' }])
   room: RoomEntity;
 
-  @OneToOne(() => EpisodeEntity)
-  @JoinColumn()
+  @ManyToOne(() => EpisodeEntity, (episode) => episode.episodes)
+  @JoinColumn([{ name: 'episodeId', referencedColumnName: 'id' }])
   episode: EpisodeEntity;
 
-  @OneToOne(() => ImageEntity)
-  @JoinColumn([{ name: 'imagUrlId', referencedColumnName: 'id' }])
+  @ManyToOne(() => ImageEntity, (image) => image.images)
+  @JoinColumn([{ name: 'imageUrlId', referencedColumnName: 'id' }])
   imageUrl: ImageEntity;
 }
