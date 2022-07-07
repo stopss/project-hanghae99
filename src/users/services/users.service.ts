@@ -70,7 +70,6 @@ export class UsersService {
       user.email = email;
       user.password = hashedPassword;
       user.social = social;
-      user.refreshToken = null;
       const newUser = await this.usersRepository.save(user);
       return { result: { success: true, ...newUser } };
     } catch (error) {
@@ -81,24 +80,21 @@ export class UsersService {
   async socialSignup(body) {
     try {
       const user = new UserEntity();
-      const { email, nickname, refreshToken } = body;
+      const { email, nickname } = body;
       const userExist = await this.usersRepository.find({ where: { email } });
       if (userExist.length !== 0) {
-        await this.usersRepository.update({ email }, { refreshToken });
         const user = await this.findUserByEmail(email);
         const payload = {
           id: user.id,
           email: user.email,
           nickname: user.nickname,
-          refreshToken: user.refreshToken,
-          social: user.refreshToken,
+          social: true,
         };
         const token = this.jwtService.sign(payload);
         return { result: { success: true, token } };
       }
       user.email = email;
       user.nickname = nickname;
-      user.refreshToken = refreshToken;
       user.social = true;
       user.password = null;
       const newUser = await this.usersRepository.save(user);
@@ -106,8 +102,7 @@ export class UsersService {
         id: newUser.id,
         email: newUser.email,
         nickname: newUser.nickname,
-        refreshToken: newUser.refreshToken,
-        social: newUser.refreshToken,
+        social: true,
       };
       const token = this.jwtService.sign(payload);
       return {

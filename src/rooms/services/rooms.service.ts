@@ -58,8 +58,8 @@ export class RoomsService {
       throw new HttpException('존재하지 않는 방입니다.', 401);
     }
 
-    await this.roomsRepository.update(id, body);
-    return { result: { success: true } };
+    const result = await this.roomsRepository.update(id, body);
+    return { result: { success: true, ...result } };
   }
 
   // 방 삭제하기

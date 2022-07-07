@@ -17,9 +17,6 @@ export class UserEntity {
   password: string;
 
   @Column({ nullable: true })
-  refreshToken: string;
-
-  @Column({ nullable: true })
   social: boolean;
 
   @Column({ nullable: true })
