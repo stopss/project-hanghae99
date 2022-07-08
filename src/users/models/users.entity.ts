@@ -20,6 +20,9 @@ export class UserEntity {
   social: boolean;
 
   @Column({ nullable: true })
+  platform: string;
+
+  @Column({ nullable: true })
   imageUrl: string;
 
   @OneToMany(() => RoomEntity, (rooms) => rooms.user)
