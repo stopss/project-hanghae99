@@ -3,6 +3,7 @@ import { UserEntity } from 'src/users/models/users.entity';
 import {
   Column,
   Entity,
+  JoinColumn,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -37,7 +38,11 @@ export class RoomEntity {
   @Column({ nullable: true })
   roomUniqueId: string;
 
+  @Column({nullable: true})
+  userId: number;
+
   @ManyToOne(() => UserEntity, (user) => user.rooms)
+  @JoinColumn([{name: 'userId', referencedColumnName: 'id'}])
   user: UserEntity;
 
   @OneToMany(() => CurrentUserEntity, (currentusers) => currentusers.room)

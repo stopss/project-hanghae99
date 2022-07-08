@@ -129,6 +129,7 @@ export class UsersService {
     const { imageUrl } = body;
     const existUser = await this.findUserById(id);
     if (!existUser) throw new HttpException('존재하지 않는 회원입니다.', 401);
+    console.log(existUser);
     await this.usersRepository.update({ id }, { imageUrl });
     return { result: { success: true } };
   }
