@@ -33,18 +33,34 @@ export class ChatService {
   }
 
   async update(data: UpdateRoomDto, socket: Socket) {
-    const { title, password, hintTime, reasoningTime, isRandom, roomId } = data;
-    const room = await this.roomsService.findRoomById(roomId);
+    const {
+      title,
+      password,
+      hintTime,
+      reasoningTime,
+      isRandom,
+      roomId,
+      master,
+    } = data;
+    const room = await this.roomsService.findRoomById(parseInt(roomId));
     const paylod = {
       title,
       password,
       hintTime,
       reasoningTime,
       isRandom,
+      master,
       count: room.count,
+      roomUniqueId: room.roomUniqueId,
+      roomState: room.roomState,
+      userId: room.userId,
     };
-    const updatedRoom = await this.roomsService.updateRoom(roomId, paylod);
+    const updatedRoom = await this.roomsService.updateRoom(
+      parseInt(roomId),
+      paylod,
+    );
     socket.to(room.roomUniqueId).emit('update_room', { roomInfo: updatedRoom });
+    socket.emit('update_room', { roomInfo: updatedRoom });
   }
 
   async chats(chat: ChatDto, socket: Socket) {
@@ -95,7 +111,7 @@ export class ChatService {
 
     // 방장이 나갔을 때
     if (user.nickname === room.nickname) {
-      console.log('방장이 나감')
+      console.log('방장이 나감');
 
       // TODO: 현재 유저 중에서 랜덤으로 방장을 넘김 -> RoomEntity Update(master, userId, count) -> CurrentUser에서 방장 userId 삭제
       // TODO: 현재 유저들에게 방장이 바뀌었다고 채팅으로 알림

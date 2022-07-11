@@ -68,7 +68,7 @@ export class UsersService {
     if (userExist.length !== 0) {
       const user = await this.findUserByEmail(email);
       const saltOrRounds = 10;
-      const hashedPassword = await bcrypt.hash("null", saltOrRounds)
+      const hashedPassword = await bcrypt.hash('null', saltOrRounds);
       const payload = {
         id: user.id,
         email: user.email,
@@ -76,7 +76,7 @@ export class UsersService {
         social: true,
         password: hashedPassword,
         imageUrl: null,
-        platform: user.email.split(':')[1]
+        platform: user.email.split(':')[1],
       };
       await this.usersRepository.update(user.id, payload);
       const token = this.jwtService.sign(payload);
@@ -84,14 +84,14 @@ export class UsersService {
     }
 
     const saltOrRounds = 10;
-    const hashedPassword = await bcrypt.hash("null", saltOrRounds)
+    const hashedPassword = await bcrypt.hash('null', saltOrRounds);
 
     user.email = email;
     user.nickname = nickname;
     user.social = true;
     user.password = hashedPassword;
     user.imageUrl = null;
-    user.platform = user.email.split(':')[1]
+    user.platform = user.email.split(':')[1];
     const newUser = await this.usersRepository.save(user);
     const payload = {
       id: newUser.id,

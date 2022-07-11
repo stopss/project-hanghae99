@@ -58,7 +58,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('exit_room')
-  handlExitRoom(@ConnectedSocket() socket: Socket, data: ExitRoomDto) {
+  handlExitRoom(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() data: ExitRoomDto,
+  ) {
     return this.chatService.exit(socket, data);
   }
 

@@ -1,4 +1,4 @@
-import { IsNumber, IsString } from 'class-validator';
+import { IsString } from 'class-validator';
 
 export class UpdateRoomDto {
   @IsString()
@@ -16,6 +16,9 @@ export class UpdateRoomDto {
   @IsString()
   isRandom: string;
 
-  @IsNumber()
-  roomId: number;
+  @IsString()
+  roomId: string;
+
+  @IsString()
+  master: string;
 }

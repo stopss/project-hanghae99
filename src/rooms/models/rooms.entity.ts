@@ -35,17 +35,17 @@ export class RoomEntity {
   @Column()
   isRandom: string;
 
-  @Column()
+  @Column({ default: 'standby' })
   roomState: string;
 
   @Column({ nullable: true })
   roomUniqueId: string;
 
-  @Column({nullable: true})
+  @Column({ nullable: true })
   userId: number;
 
   @ManyToOne(() => UserEntity, (user) => user.rooms)
-  @JoinColumn([{name: 'userId', referencedColumnName: 'id'}])
+  @JoinColumn([{ name: 'userId', referencedColumnName: 'id' }])
   user: UserEntity;
 
   @OneToMany(() => CurrentUserEntity, (currentusers) => currentusers.room)
