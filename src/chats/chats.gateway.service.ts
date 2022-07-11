@@ -80,6 +80,7 @@ export class ChatService {
     const room = await this.roomsService.findRoomById(data.roomId);
     socket.join(data.roomUniqueId);
     socket.emit('new_chat', { message: '방을 생성합니다.', roomInfo: room });
+    socket.emit('update_room', { roomInfo: room });
   }
 
   async join(socket: Socket, data: JoinRoomDto) {
@@ -97,7 +98,7 @@ export class ChatService {
     await this.roomsService.updateRoom(room.id, payload);
     await this.currentUsersService.userJoinRoom(userId, room.id);
     socket.join(room.roomUniqueId);
-    socket.to(room.roomUniqueId).emit('new_chat', {
+    socket.to(room.roomUniqueId).emit('update_room', {
       message: `${nickname}(${email})님이 입장하셨습니다.`,
       roomInfo: room,
     });
@@ -105,21 +106,21 @@ export class ChatService {
 
   async exit(socket: Socket, data: ExitRoomDto) {
     const { userId, roomId } = data;
-    await this.currentUsersService.exitRoom(parseInt(userId));
-    const user = await this.usersService.findUserById(parseInt(userId));
-    const room = await this.roomsService.findRoomById(parseInt(roomId));
+    await this.currentUsersService.exitRoom(userId);
+    const user = await this.usersService.findUserById(userId);
+    const room = await this.roomsService.findRoomById(roomId);
 
     // 방장이 나갔을 때
     if (user.nickname === room.nickname) {
       console.log('방장이 나감');
 
       // TODO: 현재 유저 중에서 랜덤으로 방장을 넘김 -> RoomEntity Update(master, userId, count) -> CurrentUser에서 방장 userId 삭제
-      if (room.userId === parseInt(userId)) {
+      if (room.userId === userId) {
       }
       // TODO: 현재 유저들에게 방장이 바뀌었다고 채팅으로 알림
 
       // TODO: 모든 유저가 방을 나갔을 때 방 삭제
-      if (room.count === 1) {
+      if (+room.count === 1) {
         await this.roomsService.deleteRoom(room.id);
         await this.currentUsersService.exitRoom(parseInt(user.userId));
       }
@@ -133,7 +134,7 @@ export class ChatService {
       isRandom: room.isRandom,
       count: parseInt(room.count) - 1,
     };
-    await this.roomsService.updateRoom(parseInt(roomId), payload);
+    await this.roomsService.updateRoom(roomId, payload);
     await this.currentUsersService.exitRoom(parseInt(user.userId));
     socket.to(room.roomUniqueId).emit('new_chat', {
       message: `${user.nickname}님이 퇴장했습니다.`,

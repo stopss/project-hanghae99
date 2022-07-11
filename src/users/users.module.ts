@@ -13,12 +13,12 @@ import { LogModule } from 'src/log/log.module';
   imports: [
     DatabaseModule,
     CurrentUsersModule,
-    forwardRef(() => LogModule),
     forwardRef(() => AuthModule),
     JwtModule.register({
       secret: jwtConstants.secret,
       signOptions: { expiresIn: '1y' },
     }),
+    forwardRef(() => LogModule),
   ],
   providers: [UsersService, ...userProviders],
   controllers: [UsersController],
