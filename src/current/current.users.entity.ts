@@ -21,6 +21,9 @@ export class CurrentUserEntity {
   @Column('int', { name: 'roomId', nullable: true })
   roomId: number | null;
 
+  @Column()
+  readyState: boolean;
+
   @ManyToOne(() => UserEntity, (user) => user.users)
   @JoinColumn([{ name: 'userId', referencedColumnName: 'id' }])
   user: UserEntity;

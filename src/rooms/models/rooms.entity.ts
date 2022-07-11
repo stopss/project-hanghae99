@@ -34,6 +34,9 @@ export class RoomEntity {
   @Column()
   isRandom: string;
 
+  @Column()
+  roomState: string;
+
   @Column({ nullable: true })
   roomUniqueId: string;
 
