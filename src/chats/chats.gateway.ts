@@ -13,10 +13,12 @@ import { JoinRoomDto } from './dto/join.room.dto';
 import { ExitRoomDto } from './dto/exit.room.dto';
 import { UpdateRoomDto } from './dto/update.room.dto';
 import { CreateRoomDto } from './dto/create.room.dto';
+import { PeerRoomDto } from './dto/peer.room.dto';
 
 @WebSocketGateway({
-  transports: ['websocket'],
-  cors: { origin: '*' },
+  // transports: ['websocket'],
+  // cors: { origin: '*' },
+  namespace: 'chattings'
 })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(private readonly chatService: ChatService) {}
@@ -76,5 +78,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody() data: UpdateRoomDto,
   ) {
     return this.chatService.update(data, socket);
+  }
+
+  @SubscribeMessage('peer_join_room')
+  handlePeerJoinRoom(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() data: PeerRoomDto,
+  ) {
+    return this.chatService.peerJoin(socket, data);
   }
 }

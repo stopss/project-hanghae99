@@ -9,6 +9,7 @@ import { CurrentUsersService } from 'src/current/services/current.service';
 import { ExitRoomDto } from './dto/exit.room.dto';
 import { UpdateRoomDto } from './dto/update.room.dto';
 import { CreateRoomDto } from './dto/create.room.dto';
+import { PeerRoomDto } from './dto/peer.room.dto';
 
 @Injectable()
 export class ChatService {
@@ -85,6 +86,15 @@ export class ChatService {
       message: `${nickname}(${email})님이 입장하셨습니다.`,
       roomInfo: room,
     });
+  }
+
+  async peerJoin(socket: Socket, data: PeerRoomDto) {
+    const { userId, roomId, email, nickname, peerId } = data;
+    const room = await this.roomsService.findRoomById(roomId);
+    console.log("peerId: ", peerId);
+    console.log(room.roomUniqueId);
+    socket.join(room.roomUniqueId);
+    socket.broadcast.to(room.roomUniqueId).emit('user_connected', peerId);
   }
 
   async exit(socket: Socket, data: ExitRoomDto) {
