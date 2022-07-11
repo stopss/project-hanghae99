@@ -18,99 +18,91 @@ export class UsersService {
   ) {}
 
   async findUserByEmail(email: string) {
-    try {
-      const result = await this.usersRepository.findOne({ where: { email } });
-      return result;
-    } catch (error) {
-      throw new HttpException('존재하지 않는 이메일입니다.', 401);
-    }
+    const result = await this.usersRepository.findOne({ where: { email } });
+    return result;
   }
 
   async findUserByNickname(nickname: string): Promise<any> {
-    try {
-      const result = await this.usersRepository.findOne({
-        where: { nickname },
-      });
-      return result;
-    } catch (error) {
-      throw new HttpException('서버 에러', 500);
-    }
+    const result = await this.usersRepository.findOne({
+      where: { nickname },
+    });
+    return result;
   }
 
   async findUserById(id: number): Promise<any> {
-    try {
-      const result = await this.usersRepository.findOne({ where: { id } });
-      return result;
-    } catch (error) {
-      throw new HttpException('서버 에러', 500);
-    }
+    const result = await this.usersRepository.findOne({ where: { id } });
+    return result;
   }
 
   async signup(body: SignupUserDto): Promise<any> {
-    try {
-      const user = new UserEntity();
-      const { nickname, email, password, passwordCheck } = body;
-      const userExist = await this.usersRepository.find({ where: { email } });
-      const isExistNickname = await this.findUserByNickname(nickname);
-      const social = false;
+    const user = new UserEntity();
+    const { nickname, email, password, passwordCheck } = body;
+    const userExist = await this.usersRepository.find({ where: { email } });
+    const isExistNickname = await this.findUserByNickname(nickname);
+    const social = false;
 
-      if (userExist.length !== 0)
-        throw new HttpException('이미 존재하는 이메일입니다.', 400);
+    if (userExist.length !== 0)
+      throw new HttpException('이미 존재하는 이메일입니다.', 400);
 
-      if (password !== passwordCheck)
-        throw new HttpException('비밀번호를 다시 확인해주세요.', 400);
+    if (password !== passwordCheck)
+      throw new HttpException('비밀번호를 다시 확인해주세요.', 400);
 
-      if (isExistNickname !== null)
-        throw new HttpException('이미 존재하는 닉네임입니다.', 400);
+    if (isExistNickname !== null)
+      throw new HttpException('이미 존재하는 닉네임입니다.', 400);
 
-      const saltOrRounds = 10;
-      const hashedPassword = await bcrypt.hash(password, saltOrRounds);
+    const saltOrRounds = 10;
+    const hashedPassword = await bcrypt.hash(password, saltOrRounds);
 
-      user.nickname = nickname;
-      user.email = email;
-      user.password = hashedPassword;
-      user.social = social;
-      const newUser = await this.usersRepository.save(user);
-      return { result: { success: true, ...newUser } };
-    } catch (error) {
-      throw new HttpException('서버 에러', 500);
-    }
+    user.nickname = nickname;
+    user.email = email;
+    user.password = hashedPassword;
+    user.social = social;
+    const newUser = await this.usersRepository.save(user);
+    return { result: { success: true, ...newUser } };
   }
 
   async socialSignup(body) {
-    try {
-      const user = new UserEntity();
-      const { email, nickname } = body;
-      const userExist = await this.usersRepository.find({ where: { email } });
-      if (userExist.length !== 0) {
-        const user = await this.findUserByEmail(email);
-        const payload = {
-          id: user.id,
-          email: user.email,
-          nickname: user.nickname,
-          social: true,
-        };
-        const token = this.jwtService.sign(payload);
-        return { result: { success: true, token } };
-      }
-      user.email = email;
-      user.nickname = nickname;
-      user.social = true;
-      user.password = null;
-      const newUser = await this.usersRepository.save(user);
+    const user = new UserEntity();
+    const { email, nickname } = body;
+    const userExist = await this.usersRepository.find({ where: { email } });
+    if (userExist.length !== 0) {
+      const user = await this.findUserByEmail(email);
+      const saltOrRounds = 10;
+      const hashedPassword = await bcrypt.hash("null", saltOrRounds)
       const payload = {
-        id: newUser.id,
-        email: newUser.email,
-        nickname: newUser.nickname,
+        id: user.id,
+        email: user.email,
+        nickname: user.nickname,
         social: true,
+        password: hashedPassword,
+        imageUrl: null,
+        platform: user.email.split(':')[1]
       };
+      await this.usersRepository.update(user.id, payload);
       const token = this.jwtService.sign(payload);
-      return {
-        result: { success: true, token },
-      };
-    } catch (error) {
-      throw new HttpException('서버 에러', 500);
+      return { result: { success: true, token } };
     }
+
+    const saltOrRounds = 10;
+    const hashedPassword = await bcrypt.hash("null", saltOrRounds)
+
+    user.email = email;
+    user.nickname = nickname;
+    user.social = true;
+    user.password = hashedPassword;
+    user.imageUrl = null;
+    user.platform = user.email.split(':')[1]
+    const newUser = await this.usersRepository.save(user);
+    const payload = {
+      id: newUser.id,
+      email: newUser.email,
+      nickname: newUser.nickname,
+      social: true,
+    };
+    const token = this.jwtService.sign(payload);
+    return {
+      result: { success: true, token },
+    };
   }
 
   async getUser(id: number) {
@@ -137,6 +129,7 @@ export class UsersService {
     const { imageUrl } = body;
     const existUser = await this.findUserById(id);
     if (!existUser) throw new HttpException('존재하지 않는 회원입니다.', 401);
+    console.log(existUser);
     await this.usersRepository.update({ id }, { imageUrl });
     return { result: { success: true } };
   }

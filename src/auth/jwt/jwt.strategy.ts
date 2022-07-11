@@ -15,9 +15,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
   async validate(payload: Payload) {
-    const id = payload.sub;
-    const user = await this.usersService.findUserById(parseInt(id));
-    if (user) return user;
-    else throw new UnauthorizedException('접근 권한 없음');
+    //const id = payload.sub;
+    //const user = await this.usersService.findUserById(parseInt(id));
+    //console.log(user)
+    //if (user) return user;
+    //else throw new UnauthorizedException('접근 권한 없음');
+    return payload;
   }
 }
