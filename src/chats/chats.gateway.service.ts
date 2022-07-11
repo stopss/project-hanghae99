@@ -114,7 +114,15 @@ export class ChatService {
       console.log('방장이 나감');
 
       // TODO: 현재 유저 중에서 랜덤으로 방장을 넘김 -> RoomEntity Update(master, userId, count) -> CurrentUser에서 방장 userId 삭제
+      if (room.userId === parseInt(userId)) {
+      }
       // TODO: 현재 유저들에게 방장이 바뀌었다고 채팅으로 알림
+
+      // TODO: 모든 유저가 방을 나갔을 때 방 삭제
+      if (room.count === 1) {
+        await this.roomsService.deleteRoom(room.id);
+        await this.currentUsersService.exitRoom(parseInt(user.userId));
+      }
     }
 
     const payload = {
@@ -130,5 +138,15 @@ export class ChatService {
     socket.to(room.roomUniqueId).emit('new_chat', {
       message: `${user.nickname}님이 퇴장했습니다.`,
     });
+  }
+
+  async ready(socket: Socket, userId: string, roomId: string) {
+    // TODO: 방 정보 가져오기
+    // TODO: CurrentUser 가져오기
+  }
+
+  async start(socket: Socket, userId: string, roomId: string) {
+    // TODO: 방 정보 가져오기
+    // TODO: CurrentUser 가져오기
   }
 }

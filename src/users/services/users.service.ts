@@ -106,6 +106,7 @@ export class UsersService {
   }
 
   async getUser(id: number) {
+    console.log(id);
     const result = await this.currentUsersService.getLog(id);
     return { result: { success: true, ...result } };
   }

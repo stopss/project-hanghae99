@@ -23,7 +23,7 @@ export class CurrentUsersService {
       }
       delete users[i].user.password;
     }
-    return users[0];
+    return users;
   }
 
   async userJoinRoom(userId: number, roomId: number) {
