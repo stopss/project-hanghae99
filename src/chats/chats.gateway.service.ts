@@ -79,9 +79,14 @@ export class ChatService {
 
   async create(socket: Socket, data: CreateRoomDto) {
     const room = await this.roomsService.findRoomById(data.roomId);
+    const currentUser = await this.currentUsersService.userJoinRoom(
+      room.userId,
+      data.roomId,
+    );
+    const user = await this.usersService.findUserById(currentUser.userId);
     socket.join(data.roomUniqueId);
     socket.emit('new_chat', { message: '방을 생성합니다.', roomInfo: room });
-    socket.emit('update_room', { roomInfo: room });
+    socket.emit('update_room', { roomInfo: room, currentUser: user });
   }
 
   async join(socket: Socket, data: JoinRoomDto) {
@@ -113,15 +118,39 @@ export class ChatService {
     const room = await this.roomsService.findRoomById(roomId);
 
     if (user.nickname === room.master) {
-      // TODO: 방장이 나가면서 동시에 count가 1일 때
-      await this.currentUsersService.exitRoom(userId);
-      const currentUser = await this.currentUsersService.currentUsers(roomId);
-      let result = [];
-      for (let i = 0; i < currentUser.length; i++) {
-        result.push(await this.usersService.findUserById(currentUser[i].id));
-        delete result[i].password;
+      if (+room.count === 1) {
+        await this.roomsService.deleteRoom(room.id);
+        await this.currentUsersService.exitRoom(userId);
+        socket.emit('update_room', { message: '방을 삭제합니다.' });
+      } else {
+        await this.currentUsersService.exitRoom(userId);
+        const currentUser = await this.currentUsersService.currentUsers(roomId);
+        let result = [];
+        for (let i = 0; i < currentUser.length; i++) {
+          result.push(await this.usersService.findUserById(currentUser[i].id));
+          result[i].readyState = currentUser[i].readyState;
+          delete result[i].password;
+        }
+        const newMasterNo = Math.floor(Math.random() * result.length + 1);
+        const payload = {
+          title: room.title,
+          password: room.password,
+          hintTime: room.hintTime,
+          reasoningTime: room.reasoningTime,
+          isRandom: room.isRandom,
+          count: parseInt(room.count) - 1,
+          master: result[newMasterNo - 1].nickname,
+          roomUniqueId: room.roomUniqueId,
+          userId: result[newMasterNo - 1].id,
+          roomState: room.roomState,
+        };
+        console.log(payload);
+        await this.roomsService.updateRoom(roomId, payload);
+        socket
+          .to(room.roomUniqueId)
+          .emit('update_room', { success: true, currentUser: result });
       }
-      const newMasterNo = Math.floor(Math.random() * result.length + 1);
+    } else {
       const payload = {
         title: room.title,
         password: room.password,
@@ -129,35 +158,13 @@ export class ChatService {
         reasoningTime: room.reasoningTime,
         isRandom: room.isRandom,
         count: parseInt(room.count) - 1,
-        master: result[newMasterNo - 1].nickname,
-        roomUniqueId: room.roomUniqueId,
-        userId: result[newMasterNo - 1].id,
-        roomState: room.roomState,
       };
       await this.roomsService.updateRoom(roomId, payload);
-      socket
-        .to(room.roomUniqueId)
-        .emit('update_room', { success: true, currentUser: result });
+      await this.currentUsersService.exitRoom(userId);
+      socket.to(room.roomUniqueId).emit('new_chat', {
+        message: `${user.nickname}님이 퇴장했습니다.`,
+      });
     }
-
-    if (+room.count === 1) {
-      await this.roomsService.deleteRoom(room.id);
-      await this.currentUsersService.exitRoom(parseInt(user.userId));
-    }
-
-    const payload = {
-      title: room.title,
-      password: room.password,
-      hintTime: room.hintTime,
-      reasoningTime: room.reasoningTime,
-      isRandom: room.isRandom,
-      count: parseInt(room.count) - 1,
-    };
-    await this.roomsService.updateRoom(roomId, payload);
-    await this.currentUsersService.exitRoom(parseInt(user.userId));
-    socket.to(room.roomUniqueId).emit('new_chat', {
-      message: `${user.nickname}님이 퇴장했습니다.`,
-    });
   }
 
   async ready(socket: Socket, userId: string, roomId: string) {

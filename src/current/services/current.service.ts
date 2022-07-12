@@ -68,8 +68,8 @@ export class CurrentUsersService {
 
   async exitRoom(userId: number) {
     const user = new CurrentUserEntity();
-    user.userId = userId;
-    const result = await this.currentUsersRepository.delete(user);
+    // user.userId = userId;
+    const result = this.currentUsersRepository.delete({ userId: userId });
     return result;
   }
 }
