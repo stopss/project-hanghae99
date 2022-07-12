@@ -9,6 +9,25 @@ export class CurrentUsersService {
     private readonly currentUsersRepository: Repository<CurrentUserEntity>,
   ) {}
 
+  async readyStateUpdate(userId: number, roomId: number) {
+    const user = new CurrentUserEntity();
+    if (user.readyState === true) {
+      user.readyState = false;
+      await this.currentUsersRepository.update({ id: userId }, user);
+      const users = await this.currentUsersRepository.find({
+        where: { roomId },
+      });
+      return users;
+    } else {
+      user.readyState = true;
+      await this.currentUsersRepository.update({ id: userId }, user);
+      const users = await this.currentUsersRepository.find({
+        where: { roomId },
+      });
+      return users;
+    }
+  }
+
   async getLog(userId: number) {
     const users = await this.currentUsersRepository.find({
       relations: {

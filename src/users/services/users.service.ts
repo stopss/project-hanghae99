@@ -134,4 +134,27 @@ export class UsersService {
     await this.usersRepository.update({ id }, { imageUrl });
     return { result: { success: true } };
   }
+
+  async test(roomId: number) {
+    let users = await this.currentUsersService.currentUsers(roomId);
+    let result = [];
+    for (let i = 0; i < users.length; i++) {
+      result.push(await this.findUserById(users[i].id));
+      result[i].readyState = users[i].readyState;
+      delete result[i].password;
+    }
+    const newMaster = Math.floor(Math.random() * result.length + 1);
+    console.log(result);
+    let random = [];
+    let i = 0;
+    while (i < 6) {
+      let n = Math.floor(Math.random() * 5) + 1;
+      if (!random.find((e) => e === n)) {
+        random.push(n);
+        i++;
+      }
+    }
+    console.log(random);
+    return users;
+  }
 }

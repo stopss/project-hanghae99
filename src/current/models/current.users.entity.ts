@@ -21,6 +21,12 @@ export class CurrentUserEntity {
   @Column('int', { name: 'roomId', nullable: true })
   roomId: number | null;
 
+  @Column('int', { name: 'episodeId', nullable: true })
+  episodeId;
+
+  @Column('int', { name: 'imageUrlId', nullable: true })
+  imageUrlId;
+
   @Column()
   readyState: boolean;
 

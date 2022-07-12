@@ -102,6 +102,7 @@ export class ChatService {
       message: `${nickname}(${email})님이 입장하셨습니다.`,
       roomInfo: room,
     });
+    socket.emit('update_room', { roomInfo: room });
   }
 
   async exit(socket: Socket, data: ExitRoomDto) {
@@ -110,35 +111,33 @@ export class ChatService {
     const user = await this.usersService.findUserById(userId);
     const room = await this.roomsService.findRoomById(roomId);
 
-    // 방장이 나갔을 때
     if (user.nickname === room.master) {
-      if (room.userId === userId) {
-        const currentUser = await this.currentUsersService.currentUsers(roomId);
-        let result = [];
-        for (let i = 0; i < currentUser.length; i++) {
-          result.push(await this.usersService.findUserById(currentUser[i].id));
-        }
-        const newMasterNo = Math.floor(Math.random() + result.length + 1);
-        const payload = {
-          title: room.title,
-          password: room.password,
-          hintTime: room.hintTime,
-          reasoningTime: room.reasoningTime,
-          isRandom: room.isRandom,
-          count: parseInt(room.count) - 1,
-          master: result[newMasterNo - 1].nickname,
-          roomUniqueId: room.roomUniqueId,
-          userId: result[newMasterNo - 1].id,
-          roomState: room.roomState,
-        };
-        await this.roomsService.updateRoom(roomId, payload);
-        await this.currentUsersService.exitRoom(
-          parseInt(result[newMasterNo - 1].id),
-        );
+      await this.currentUsersService.exitRoom(userId);
+      const currentUser = await this.currentUsersService.currentUsers(roomId);
+      let result = [];
+      for (let i = 0; i < currentUser.length; i++) {
+        result.push(await this.usersService.findUserById(currentUser[i].id));
+        delete result[i].password;
       }
-      // TODO: 현재 유저들에게 방장이 바뀌었다고 채팅으로 알림
+      const newMasterNo = Math.floor(Math.random() * result.length + 1);
+      const payload = {
+        title: room.title,
+        password: room.password,
+        hintTime: room.hintTime,
+        reasoningTime: room.reasoningTime,
+        isRandom: room.isRandom,
+        count: parseInt(room.count) - 1,
+        master: result[newMasterNo - 1].nickname,
+        roomUniqueId: room.roomUniqueId,
+        userId: result[newMasterNo - 1].id,
+        roomState: room.roomState,
+      };
+      await this.roomsService.updateRoom(roomId, payload);
+      socket
+        .to(room.roomUniqueId)
+        .emit('update_chat', { success: true, currentUser: result });
     }
-    // TODO: 모든 유저가 방을 나갔을 때 방 삭제
+
     if (+room.count === 1) {
       await this.roomsService.deleteRoom(room.id);
       await this.currentUsersService.exitRoom(parseInt(user.userId));
@@ -160,11 +159,35 @@ export class ChatService {
   }
 
   async ready(socket: Socket, userId: string, roomId: string) {
-    // TODO: 방 정보 가져오기
-    // TODO: CurrentUser 가져오기
+    const users = await this.currentUsersService.readyStateUpdate(
+      +userId,
+      +roomId,
+    );
+    const room = await this.roomsService.findRoomById(+roomId);
+    let result = [];
+    for (let i = 0; i < users.length; i++) {
+      result.push(await this.usersService.findUserById(users[i].id));
+      result[i].readyState = users[i].readyState;
+      delete result[i].password;
+    }
+    socket
+      .to(room.roomUniqueId)
+      .emit('update_chat', { roomInfo: room, currentUser: result });
   }
 
   async start(socket: Socket, userId: string, roomId: string) {
+    const room = await this.roomsService.findRoomById(+roomId);
+    let random = [];
+    let i = 0;
+    if (room.isRandom === true) {
+      while (i < 6) {
+        let n = Math.floor(Math.random() * 5) + 1;
+        if (!random.find((e) => e === n)) {
+          random.push(n);
+          i++;
+        }
+      }
+    }
     // TODO: 방 정보 가져오기
     // TODO: CurrentUser 가져오기
   }
