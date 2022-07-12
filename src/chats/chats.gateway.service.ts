@@ -111,19 +111,37 @@ export class ChatService {
     const room = await this.roomsService.findRoomById(roomId);
 
     // 방장이 나갔을 때
-    if (user.nickname === room.nickname) {
-      console.log('방장이 나감');
-
-      // TODO: 현재 유저 중에서 랜덤으로 방장을 넘김 -> RoomEntity Update(master, userId, count) -> CurrentUser에서 방장 userId 삭제
+    if (user.nickname === room.master) {
       if (room.userId === userId) {
+        const currentUser = await this.currentUsersService.currentUsers(roomId);
+        let result = [];
+        for (let i = 0; i < currentUser.length; i++) {
+          result.push(await this.usersService.findUserById(currentUser[i].id));
+        }
+        const newMasterNo = Math.floor(Math.random() + result.length + 1);
+        const payload = {
+          title: room.title,
+          password: room.password,
+          hintTime: room.hintTime,
+          reasoningTime: room.reasoningTime,
+          isRandom: room.isRandom,
+          count: parseInt(room.count) - 1,
+          master: result[newMasterNo - 1].nickname,
+          roomUniqueId: room.roomUniqueId,
+          userId: result[newMasterNo - 1].id,
+          roomState: room.roomState,
+        };
+        await this.roomsService.updateRoom(roomId, payload);
+        await this.currentUsersService.exitRoom(
+          parseInt(result[newMasterNo - 1].id),
+        );
       }
       // TODO: 현재 유저들에게 방장이 바뀌었다고 채팅으로 알림
-
-      // TODO: 모든 유저가 방을 나갔을 때 방 삭제
-      if (+room.count === 1) {
-        await this.roomsService.deleteRoom(room.id);
-        await this.currentUsersService.exitRoom(parseInt(user.userId));
-      }
+    }
+    // TODO: 모든 유저가 방을 나갔을 때 방 삭제
+    if (+room.count === 1) {
+      await this.roomsService.deleteRoom(room.id);
+      await this.currentUsersService.exitRoom(parseInt(user.userId));
     }
 
     const payload = {

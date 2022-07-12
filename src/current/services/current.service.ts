@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { Entity, Repository } from 'typeorm';
-import { CurrentUserEntity } from '../current.users.entity';
+import { Repository } from 'typeorm';
+import { CurrentUserEntity } from '../models/current.users.entity';
 
 @Injectable()
 export class CurrentUsersService {
@@ -23,6 +23,19 @@ export class CurrentUsersService {
       }
       delete users[i].user.password;
     }
+    return users;
+  }
+
+  async currentUser(roomId: number) {
+    const users = await this.currentUsersRepository.find({
+      relations: { room: true },
+      where: { roomId: roomId },
+    });
+    return users;
+  }
+
+  async currentUsers(roomId: number) {
+    const users = await this.currentUsersRepository.find({ where: { roomId } });
     return users;
   }
 

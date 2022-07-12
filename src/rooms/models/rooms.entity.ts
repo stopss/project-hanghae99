@@ -1,4 +1,4 @@
-import { CurrentUserEntity } from 'src/current/current.users.entity';
+import { CurrentUserEntity } from 'src/current/models/current.users.entity';
 import { UserEntity } from 'src/users/models/users.entity';
 import {
   Column,

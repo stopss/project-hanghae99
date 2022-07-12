@@ -1,5 +1,5 @@
 import { ImageEntity } from './../../images/images.entity';
-import { CurrentUserEntity } from 'src/current/current.users.entity';
+import { CurrentUserEntity } from 'src/current/models/current.users.entity';
 import { EpisodeEntity } from 'src/episode/episode.entity';
 import { RoomEntity } from 'src/rooms/models/rooms.entity';
 import { UserEntity } from 'src/users/models/users.entity';

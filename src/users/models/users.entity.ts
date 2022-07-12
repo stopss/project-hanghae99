@@ -1,4 +1,4 @@
-import { CurrentUserEntity } from 'src/current/current.users.entity';
+import { CurrentUserEntity } from 'src/current/models/current.users.entity';
 import { GameLogEntity } from 'src/log/models/logs.entity';
 import { RoomEntity } from 'src/rooms/models/rooms.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
