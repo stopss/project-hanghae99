@@ -22,12 +22,12 @@ export class CurrentUserEntity {
   roomId: number | null;
 
   @Column('int', { name: 'episodeId', nullable: true })
-  episodeId;
+  episodeId: number;
 
   @Column('int', { name: 'imageUrlId', nullable: true })
-  imageUrlId;
+  imageUrlId: number;
 
-  @Column()
+  @Column({ default: false })
   readyState: boolean;
 
   @ManyToOne(() => UserEntity, (user) => user.users)

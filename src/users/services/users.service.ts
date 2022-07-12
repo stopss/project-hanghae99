@@ -145,16 +145,16 @@ export class UsersService {
     }
     const newMaster = Math.floor(Math.random() * result.length + 1);
     console.log(result);
-    let random = [];
-    let i = 0;
-    while (i < 6) {
-      let n = Math.floor(Math.random() * 5) + 1;
-      if (!random.find((e) => e === n)) {
-        random.push(n);
-        i++;
-      }
-    }
-    console.log(random);
-    return users;
+    // let random = [];
+    // let i = 0;
+    // while (i < 6) {
+    //   let n = Math.floor(Math.random() * 5) + 1;
+    //   if (!random.find((e) => e === n)) {
+    //     random.push(n);
+    //     i++;
+    //   }
+    // }
+    // console.log(random);
+    return result;
   }
 }

@@ -59,8 +59,9 @@ export class ChatService {
       parseInt(roomId),
       paylod,
     );
-    socket.to(room.roomUniqueId).emit('update_room', { roomInfo: updatedRoom });
-    socket.emit('update_room', { roomInfo: updatedRoom });
+    const result = await this.roomsService.findRoomById(parseInt(roomId));
+    socket.to(room.roomUniqueId).emit('update_room', { roomInfo: result });
+    socket.emit('update_room', { roomInfo: result });
   }
 
   async chats(chat: ChatDto, socket: Socket) {
@@ -112,6 +113,7 @@ export class ChatService {
     const room = await this.roomsService.findRoomById(roomId);
 
     if (user.nickname === room.master) {
+      // TODO: 방장이 나가면서 동시에 count가 1일 때
       await this.currentUsersService.exitRoom(userId);
       const currentUser = await this.currentUsersService.currentUsers(roomId);
       let result = [];
@@ -135,7 +137,7 @@ export class ChatService {
       await this.roomsService.updateRoom(roomId, payload);
       socket
         .to(room.roomUniqueId)
-        .emit('update_chat', { success: true, currentUser: result });
+        .emit('update_room', { success: true, currentUser: result });
     }
 
     if (+room.count === 1) {
@@ -172,7 +174,7 @@ export class ChatService {
     }
     socket
       .to(room.roomUniqueId)
-      .emit('update_chat', { roomInfo: room, currentUser: result });
+      .emit('update_room', { roomInfo: room, currentUser: result });
   }
 
   async start(socket: Socket, userId: string, roomId: string) {
