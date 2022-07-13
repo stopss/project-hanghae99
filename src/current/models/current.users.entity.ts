@@ -30,6 +30,9 @@ export class CurrentUserEntity {
   @Column({ default: false })
   readyState: boolean;
 
+  @Column({ default: false })
+  hintReady: boolean;
+
   @ManyToOne(() => UserEntity, (user) => user.users)
   @JoinColumn([{ name: 'userId', referencedColumnName: 'id' }])
   user: UserEntity;

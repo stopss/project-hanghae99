@@ -24,4 +24,13 @@ export class UpdateRoomDto {
 
   @IsString()
   roomState: string;
+
+  @IsString()
+  master: string;
+
+  @IsNumber()
+  userId: number;
+
+  @IsNumber()
+  hintReady: number;
 }

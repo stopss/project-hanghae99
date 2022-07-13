@@ -88,6 +88,14 @@ export class CurrentUsersService {
     return result;
   }
 
+  async hint(userId: number) {
+    const updated = await this.currentUsersRepository.update(
+      { userId },
+      { hintReady: true },
+    );
+    return updated;
+  }
+
   async exitRoom(userId: number) {
     const user = new CurrentUserEntity();
     // user.userId = userId;
