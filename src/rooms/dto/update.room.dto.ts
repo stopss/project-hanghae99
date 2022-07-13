@@ -18,4 +18,19 @@ export class UpdateRoomDto {
 
   @IsNumber()
   count: number;
+
+  @IsString()
+  roomUniqueId: string;
+
+  @IsString()
+  roomState: string;
+
+  @IsString()
+  master: string;
+
+  @IsNumber()
+  userId: number;
+
+  @IsNumber()
+  hintReady: number;
 }

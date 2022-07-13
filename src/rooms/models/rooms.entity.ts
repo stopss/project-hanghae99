@@ -44,6 +44,9 @@ export class RoomEntity {
   @Column({ nullable: true })
   userId: number;
 
+  @Column({ default: 0 })
+  hintReady: number;
+
   @ManyToOne(() => UserEntity, (user) => user.rooms)
   @JoinColumn([{ name: 'userId', referencedColumnName: 'id' }])
   user: UserEntity;

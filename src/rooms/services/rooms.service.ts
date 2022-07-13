@@ -53,7 +53,6 @@ export class RoomsService {
 
   // 방 수정하기
   async updateRoom(id: number, body: UpdateRoomDto) {
-    console.log('수정');
     const existRoom = await this.findRoomById(id);
     if (!existRoom) {
       throw new HttpException('존재하지 않는 방입니다.', 401);

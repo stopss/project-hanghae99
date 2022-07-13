@@ -1,3 +1,4 @@
+import { RoomsService } from './../../rooms/services/rooms.service';
 import { Inject, Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { CurrentUserEntity } from '../models/current.users.entity';
@@ -64,6 +65,35 @@ export class CurrentUsersService {
     newJoiner.userId = userId;
     const result = await this.currentUsersRepository.save(newJoiner);
     return result;
+  }
+
+  async roleRegister(roomId: number, room: Array<number>) {
+    const users = await this.currentUsers(roomId);
+    let result = [];
+    for (let i = 0; i < room.length; i++) {
+      const payload = {
+        userId: users[i].userId,
+        roomId: users[i].roomId,
+        episodeId: room[i],
+        imageUrlId: room[i],
+        readyState: true,
+      };
+      result.push(
+        await this.currentUsersRepository.update(
+          { userId: users[i].userId },
+          payload,
+        ),
+      );
+    }
+    return result;
+  }
+
+  async hint(userId: number) {
+    const updated = await this.currentUsersRepository.update(
+      { userId },
+      { hintReady: true },
+    );
+    return updated;
   }
 
   async exitRoom(userId: number) {
