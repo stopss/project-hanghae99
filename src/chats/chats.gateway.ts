@@ -16,9 +16,9 @@ import { CreateRoomDto } from './dto/create.room.dto';
 import { PeerRoomDto } from './dto/peer.room.dto';
 
 @WebSocketGateway({
-  // transports: ['websocket'],
-  // cors: { origin: '*' },
-  namespace: 'chattings'
+  transports: ['websocket'],
+  cors: { origin: '*' },
+  // namespace: 'chattings'
 })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(private readonly chatService: ChatService) {}
