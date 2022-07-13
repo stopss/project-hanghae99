@@ -148,7 +148,9 @@ export class ChatService {
         }
         let result = [];
         for (let i = 0; i < currentUser.length; i++) {
-          result.push(await this.usersService.findUserById(currentUser[i].id));
+          result.push(
+            await this.usersService.findUserById(currentUser[i].userId),
+          );
           result[i].readyState = currentUser[i].readyState;
           delete result[i].password;
         }
@@ -206,7 +208,7 @@ export class ChatService {
     const room = await this.roomsService.findRoomById(+roomId);
     let result = [];
     for (let i = 0; i < users.length; i++) {
-      result.push(await this.usersService.findUserById(users[i].id));
+      result.push(await this.usersService.findUserById(users[i].userId));
       result[i].readyState = users[i].readyState;
       delete result[i].password;
     }

@@ -12,7 +12,10 @@ export class CurrentUsersService {
 
   async readyStateUpdate(userId: number, roomId: number) {
     const user = new CurrentUserEntity();
-    if (user.readyState === true) {
+    const userReadyState = await this.currentUsersRepository.findOne({
+      where: { userId },
+    });
+    if (userReadyState.readyState === true) {
       user.readyState = false;
       await this.currentUsersRepository.update({ id: userId }, user);
       const users = await this.currentUsersRepository.find({
