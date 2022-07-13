@@ -219,7 +219,7 @@ export class ChatService {
       isRandom: room.isRandom,
       count: room.count,
       roomUniqueId: room.roomUniqueId,
-      roomState: 'running',
+      roomState: 'hintReady',
     };
     await this.roomsService.updateRoom(+roomId, roomUpdatePayload);
     const currentUser = await this.currentUsersService.currentUsers(+roomId);
