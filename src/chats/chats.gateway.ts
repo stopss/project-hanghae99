@@ -112,4 +112,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ) {
     return this.chatService.hintStart(socket, +data.userId, +data.roomId);
   }
+
+  @SubscribeMessage('hint_time')
+  handleHintTime(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() data: { userId: string; roomId: string },
+  ) {
+    return this.chatService.hintTime(socket, +data.userId, +data.roomId);
+  }
 }

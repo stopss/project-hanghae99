@@ -93,7 +93,7 @@ export class ChatService {
   async join(socket: Socket, data: JoinRoomDto) {
     const { userId, roomId, email, nickname } = data;
     const room = await this.roomsService.findRoomById(roomId);
-    if (room.count === 5) return new WsException('참가인원이 꽉 찼습니다.');
+    if (room.count === 5) throw new WsException('참가인원이 꽉 찼습니다.');
     const payload = {
       title: room.title,
       password: room.password,
@@ -230,7 +230,6 @@ export class ChatService {
     await this.roomsService.updateRoom(+roomId, roomUpdatePayload);
     const currentUser = await this.currentUsersService.currentUsers(+roomId);
     const roomInfo = await this.roomsService.findRoomById(+roomId);
-    // TODO: 게임시작하면 GameLog에 게임 로그 기록
     socket.to(room.roomUniqueId).emit('update_room', {
       success: true,
       roomInfo,
@@ -269,5 +268,49 @@ export class ChatService {
     });
   }
 
-  async hintStart(socket: Socket, userId: number, roomId: number) {}
+  async hintStart(socket: Socket, userId: number, roomId: number) {
+    const room = await this.roomsService.findRoomById(roomId);
+    if (room.hintReady !== 5) {
+      throw new WsException(
+        '모든 유저가 준비완료가 되어야 시작할 수 있습니다.',
+      );
+    }
+    // TODO: 게임시작하면 GameLog에 게임 로그 기록
+
+    const payload = {
+      title: room.title,
+      password: room.password,
+      hintTime: room.hintTime,
+      reasoningTime: room.reasoningTime,
+      isRandom: room.isRandom,
+      count: room.count,
+      roomUniqueId: room.roomUniqueId,
+      roomState: 'hintStart',
+      master: room.master,
+      userId: room.userId,
+      hintReady: room.hintReady + 1,
+    };
+    await this.roomsService.updateRoom(roomId, payload);
+    const roomInfo = await this.roomsService.findRoomById(roomId);
+    socket.to(room.roomUniqueId).emit('update_room', { roomInfo });
+  }
+
+  async hintTime(socket: Socket, userId: number, roomId: number) {
+    const room = await this.roomsService.findRoomById(roomId);
+    const payload = {
+      title: room.title,
+      password: room.password,
+      hintTime: room.hintTime,
+      reasoningTime: room.reasoningTime,
+      isRandom: room.isRandom,
+      count: room.count,
+      roomUniqueId: room.roomUniqueId,
+      roomState: 'hintTime',
+      master: room.master,
+      userId: room.userId,
+      hintReady: room.hintReady + 1,
+    };
+    const roomInfo = await this.roomsService.updateRoom(roomId, payload);
+    socket.to(room.roomUniqueId).emit('update_room', { roomInfo });
+  }
 }
