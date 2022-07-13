@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { Entity, Repository } from 'typeorm';
-import { CurrentUserEntity } from '../current.users.entity';
+import { Repository } from 'typeorm';
+import { CurrentUserEntity } from '../models/current.users.entity';
 
 @Injectable()
 export class CurrentUsersService {
@@ -8,6 +8,25 @@ export class CurrentUsersService {
     @Inject('CURRENT_REPOSITORY')
     private readonly currentUsersRepository: Repository<CurrentUserEntity>,
   ) {}
+
+  async readyStateUpdate(userId: number, roomId: number) {
+    const user = new CurrentUserEntity();
+    if (user.readyState === true) {
+      user.readyState = false;
+      await this.currentUsersRepository.update({ id: userId }, user);
+      const users = await this.currentUsersRepository.find({
+        where: { roomId },
+      });
+      return users;
+    } else {
+      user.readyState = true;
+      await this.currentUsersRepository.update({ id: userId }, user);
+      const users = await this.currentUsersRepository.find({
+        where: { roomId },
+      });
+      return users;
+    }
+  }
 
   async getLog(userId: number) {
     const users = await this.currentUsersRepository.find({
@@ -23,7 +42,20 @@ export class CurrentUsersService {
       }
       delete users[i].user.password;
     }
-    return users[0];
+    return users;
+  }
+
+  async currentUser(roomId: number) {
+    const users = await this.currentUsersRepository.find({
+      relations: { room: true },
+      where: { roomId: roomId },
+    });
+    return users;
+  }
+
+  async currentUsers(roomId: number) {
+    const users = await this.currentUsersRepository.find({ where: { roomId } });
+    return users;
   }
 
   async userJoinRoom(userId: number, roomId: number) {
@@ -36,8 +68,8 @@ export class CurrentUsersService {
 
   async exitRoom(userId: number) {
     const user = new CurrentUserEntity();
-    user.userId = userId;
-    const result = await this.currentUsersRepository.delete(user);
+    // user.userId = userId;
+    const result = this.currentUsersRepository.delete({ userId: userId });
     return result;
   }
 }

@@ -10,12 +10,14 @@ import { SearchRoomDto } from '../dto/search.room.dto';
 import { UpdateRoomDto } from '../dto/update.room.dto';
 import { RoomEntity } from '../models/rooms.entity';
 import { v4 as uuidv4 } from 'uuid';
+import { UsersService } from 'src/users/services/users.service';
 
 @Injectable()
 export class RoomsService {
   constructor(
     @Inject('ROOM_REPOSITORY')
     private readonly roomsRepository: Repository<RoomEntity>,
+    private readonly usersService: UsersService,
   ) {}
 
   async findRoomById(id: number): Promise<any> {
@@ -29,26 +31,24 @@ export class RoomsService {
 
   // 방 만들기
   async createRoom(body: CreateRoomDto, master: string): Promise<any> {
-    try {
-      const room = new RoomEntity();
-      const { title, password, hintTime, reasoningTime, isRandom } = body;
-      room.title = title;
-      room.password = password;
-      room.count = 1;
-      room.hintTime = hintTime;
-      room.reasoningTime = reasoningTime;
-      room.isRandom = isRandom;
-      room.master = master;
-      room.roomUniqueId = uuidv4().toString();
+    const room = new RoomEntity();
+    const { title, password, hintTime, reasoningTime, isRandom } = body;
+    const user = await this.usersService.findUserByNickname(master);
+    room.title = title;
+    room.password = password;
+    room.count = 1;
+    room.hintTime = hintTime;
+    room.reasoningTime = reasoningTime;
+    room.isRandom = isRandom;
+    room.master = master;
+    room.roomUniqueId = uuidv4().toString();
+    room.userId = user.id;
 
-      const newRoom = await this.roomsRepository.save(room);
-      const result = { ...newRoom };
-      return {
-        result: { success: true, ...result },
-      };
-    } catch (error) {
-      throw new HttpException('서버 에러', 500);
-    }
+    const newRoom = await this.roomsRepository.save(room);
+    const result = { ...newRoom };
+    return {
+      result: { success: true, ...result },
+    };
   }
 
   // 방 수정하기

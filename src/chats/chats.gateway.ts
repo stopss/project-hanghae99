@@ -60,7 +60,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('exit_room')
-  handlExitRoom(@ConnectedSocket() socket: Socket, data: ExitRoomDto) {
+  handlExitRoom(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() data: ExitRoomDto,
+  ) {
     return this.chatService.exit(socket, data);
   }
 
@@ -86,5 +89,20 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody() data: PeerRoomDto,
   ) {
     return this.chatService.peerJoin(socket, data);
+  }
+  @SubscribeMessage('ready_state')
+  handleReady(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() data: { roomId: string; userId: string },
+  ) {
+    return this.chatService.ready(socket, data.userId, data.roomId);
+  }
+
+  @SubscribeMessage('game_start')
+  handleStart(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() data: { roomId: string; userId: string },
+  ) {
+    return this.chatService.start(socket, data.userId, data.roomId);
   }
 }

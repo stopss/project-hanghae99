@@ -1,8 +1,8 @@
-import { IsString } from 'class-validator';
+import { IsString, IsNumber } from 'class-validator';
 export class ExitRoomDto {
-  @IsString()
-  userId: string;
+  @IsNumber()
+  userId: number;
 
-  @IsString()
-  roomId: string;
+  @IsNumber()
+  roomId: number;
 }

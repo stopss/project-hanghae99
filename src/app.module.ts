@@ -10,6 +10,7 @@ import { RoomsModule } from './rooms/rooms.module';
 import { CurrentUsersModule } from './current/current.users.module';
 import { EpisodeModule } from './episode/episode.module';
 import { ImagesModule } from './images/images.module';
+import { LogModule } from './log/log.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { ImagesModule } from './images/images.module';
     CurrentUsersModule,
     EpisodeModule,
     ImagesModule,
+    LogModule,
   ],
   controllers: [AppController],
   providers: [AppService],

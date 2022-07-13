@@ -22,8 +22,6 @@ export class RoomsController {
   @Post('/room/create')
   roomCreate(@Body() body: CreateRoomDto, @Req() req) {
     const master = req.user.nickname;
-    console.log(master)
-    console.log(body)
     return this.roomsService.createRoom(body, master);
   }
 

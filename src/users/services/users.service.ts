@@ -68,7 +68,7 @@ export class UsersService {
     if (userExist.length !== 0) {
       const user = await this.findUserByEmail(email);
       const saltOrRounds = 10;
-      const hashedPassword = await bcrypt.hash("null", saltOrRounds)
+      const hashedPassword = await bcrypt.hash('null', saltOrRounds);
       const payload = {
         id: user.id,
         email: user.email,
@@ -76,7 +76,7 @@ export class UsersService {
         social: true,
         password: hashedPassword,
         imageUrl: null,
-        platform: user.email.split(':')[1]
+        platform: user.email.split(':')[1],
       };
       await this.usersRepository.update(user.id, payload);
       const token = this.jwtService.sign(payload);
@@ -84,14 +84,14 @@ export class UsersService {
     }
 
     const saltOrRounds = 10;
-    const hashedPassword = await bcrypt.hash("null", saltOrRounds)
+    const hashedPassword = await bcrypt.hash('null', saltOrRounds);
 
     user.email = email;
     user.nickname = nickname;
     user.social = true;
     user.password = hashedPassword;
     user.imageUrl = null;
-    user.platform = user.email.split(':')[1]
+    user.platform = user.email.split(':')[1];
     const newUser = await this.usersRepository.save(user);
     const payload = {
       id: newUser.id,
@@ -106,6 +106,7 @@ export class UsersService {
   }
 
   async getUser(id: number) {
+    console.log(id);
     const result = await this.currentUsersService.getLog(id);
     return { result: { success: true, ...result } };
   }
@@ -129,7 +130,31 @@ export class UsersService {
     const { imageUrl } = body;
     const existUser = await this.findUserById(id);
     if (!existUser) throw new HttpException('존재하지 않는 회원입니다.', 401);
+    console.log(existUser);
     await this.usersRepository.update({ id }, { imageUrl });
     return { result: { success: true } };
+  }
+
+  async test(roomId: number) {
+    let users = await this.currentUsersService.currentUsers(roomId);
+    let result = [];
+    for (let i = 0; i < users.length; i++) {
+      result.push(await this.findUserById(users[i].id));
+      result[i].readyState = users[i].readyState;
+      delete result[i].password;
+    }
+    const newMaster = Math.floor(Math.random() * result.length + 1);
+    console.log(result);
+    // let random = [];
+    // let i = 0;
+    // while (i < 6) {
+    //   let n = Math.floor(Math.random() * 5) + 1;
+    //   if (!random.find((e) => e === n)) {
+    //     random.push(n);
+    //     i++;
+    //   }
+    // }
+    // console.log(random);
+    return result;
   }
 }

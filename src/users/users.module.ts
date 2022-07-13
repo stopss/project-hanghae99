@@ -7,16 +7,18 @@ import { userProviders } from './models/users.provider';
 import { AuthModule } from 'src/auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from 'src/auth/jwt/constants';
+import { LogModule } from 'src/log/log.module';
 
 @Module({
   imports: [
     DatabaseModule,
-    CurrentUsersModule,
-    forwardRef(() => AuthModule),
     JwtModule.register({
       secret: jwtConstants.secret,
       signOptions: { expiresIn: '1y' },
     }),
+    forwardRef(() => CurrentUsersModule),
+    forwardRef(() => AuthModule),
+    forwardRef(() => LogModule),
   ],
   providers: [UsersService, ...userProviders],
   controllers: [UsersController],

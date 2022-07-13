@@ -5,6 +5,7 @@ import {
   Body,
   Controller,
   Get,
+  Param,
   Post,
   Put,
   Req,
@@ -49,12 +50,18 @@ export class UsersController {
   @Get('/mypage')
   @UseGuards(JwtAuthGuard)
   mypage(@Req() req) {
-    return this.usersService.getUser(req.user.id);
+    console.log(req.user, typeof req.user.sub);
+    return this.usersService.getUser(req.user.sub);
   }
 
   @Post('/mypage/image')
   @UseGuards(JwtAuthGuard)
   imageRegister(@Req() req, @Body() body: ImageRegisterDto) {
-    return this.usersService.image(req.user.id, body);
+    return this.usersService.image(req.user.sub, body);
+  }
+
+  @Get('/test/:id')
+  test(@Param('id') id: number) {
+    return this.usersService.test(id);
   }
 }

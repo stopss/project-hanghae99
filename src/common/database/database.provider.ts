@@ -1,9 +1,10 @@
 import { ImageEntity } from './../../images/images.entity';
-import { CurrentUserEntity } from 'src/current/current.users.entity';
+import { CurrentUserEntity } from 'src/current/models/current.users.entity';
 import { EpisodeEntity } from 'src/episode/episode.entity';
 import { RoomEntity } from 'src/rooms/models/rooms.entity';
 import { UserEntity } from 'src/users/models/users.entity';
 import { DataSource } from 'typeorm';
+import { GameLogEntity } from 'src/log/models/logs.entity';
 export const databaseProviders = [
   {
     provide: 'DATA_SOURCE',
@@ -22,6 +23,7 @@ export const databaseProviders = [
           CurrentUserEntity,
           EpisodeEntity,
           ImageEntity,
+          GameLogEntity,
         ],
         synchronize: true,
       });

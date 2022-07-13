@@ -20,7 +20,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     //console.log(user)
     //if (user) return user;
     //else throw new UnauthorizedException('접근 권한 없음');
-    console.log('here', payload);
     return payload;
   }
 }

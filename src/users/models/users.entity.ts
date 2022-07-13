@@ -1,4 +1,5 @@
-import { CurrentUserEntity } from 'src/current/current.users.entity';
+import { CurrentUserEntity } from 'src/current/models/current.users.entity';
+import { GameLogEntity } from 'src/log/models/logs.entity';
 import { RoomEntity } from 'src/rooms/models/rooms.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
@@ -30,4 +31,7 @@ export class UserEntity {
 
   @OneToMany(() => CurrentUserEntity, (currentusers) => currentusers.user)
   users: CurrentUserEntity;
+
+  @OneToMany(() => GameLogEntity, (log) => log.user)
+  logs: GameLogEntity;
 }
