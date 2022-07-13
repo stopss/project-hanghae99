@@ -17,14 +17,25 @@ export class CurrentUsersService {
     });
     if (userReadyState.readyState === true) {
       user.readyState = false;
-      await this.currentUsersRepository.update({ id: userId }, user);
+      await this.currentUsersRepository.update(
+        { id: userId },
+        { readyState: true },
+      );
       const users = await this.currentUsersRepository.find({
         where: { roomId },
       });
       return users;
     } else {
       user.readyState = true;
-      await this.currentUsersRepository.update({ id: userId }, user);
+      const payload = {
+        id: userReadyState.id,
+        userId: userReadyState.userId,
+        roomId: userReadyState.roomId,
+        episodeId: userReadyState.episodeId,
+        readyState: true,
+        hintReady: false,
+      };
+      await this.currentUsersRepository.update({ userId }, payload);
       const users = await this.currentUsersRepository.find({
         where: { roomId },
       });
