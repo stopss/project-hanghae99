@@ -88,7 +88,7 @@ export class ChatService {
     const user = await this.usersService.findUserById(currentUser.userId);
     socket.join(data.roomUniqueId);
     socket.emit('new_chat', { message: '방을 생성합니다.', roomInfo: room });
-    socket.emit('update_room', { roomInfo: room, currentUser: user });
+    socket.emit('update_room', { roomInfo: room, currentUser: [user] });
   }
 
   async join(socket: Socket, data: JoinRoomDto) {
@@ -121,7 +121,7 @@ export class ChatService {
   async peerJoin(socket: Socket, data: PeerRoomDto) {
     const { userId, roomId, email, nickname, peerId } = data;
     const room = await this.roomsService.findRoomById(roomId);
-    console.log("peerId: ", peerId);
+    console.log('peerId: ', peerId);
     console.log(room.roomUniqueId);
     socket.join(room.roomUniqueId);
     socket.broadcast.to(room.roomUniqueId).emit('user_connected', peerId);
@@ -136,8 +136,8 @@ export class ChatService {
 
     if (user.nickname === room.master) {
       if (+room.count === 1) {
-        await this.roomsService.deleteRoom(room.id);
         await this.currentUsersService.exitRoom(userId);
+        await this.roomsService.deleteRoom(room.id);
         socket.emit('update_room', { message: '방을 삭제합니다.' });
       } else {
         await this.currentUsersService.exitRoom(userId);
@@ -172,6 +172,11 @@ export class ChatService {
           .emit('update_room', { success: true, currentUser: result });
       }
     } else {
+      if (+room.count === 1) {
+        await this.currentUsersService.exitRoom(userId);
+        await this.roomsService.deleteRoom(room.id);
+        socket.emit('update_room', { message: '방을 삭제합니다.' });
+      }
       const payload = {
         title: room.title,
         password: room.password,
