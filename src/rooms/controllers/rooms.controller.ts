@@ -7,6 +7,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   Req,
   UseGuards,
   ValidationPipe,
@@ -41,7 +42,7 @@ export class RoomsController {
   }
 
   @Get('/room/search')
-  roomSearch(@Body() body) {
-    return this.roomsService.searchRoom(body);
+  roomSearch(@Query() query) {
+    return this.roomsService.searchRoom(query);
   }
 }

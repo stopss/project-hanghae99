@@ -43,8 +43,6 @@ myPeer.on('open', (id) => {
   const payload = {
     userId: 1,
     roomId: 1,
-    nickname: 'test',
-    email: 'test@email.com',
     peerId: id,
   };
   socket.emit('peer_join_room', payload);
