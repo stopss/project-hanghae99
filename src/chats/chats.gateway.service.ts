@@ -136,7 +136,7 @@ export class ChatService {
   }
 
   async peerJoin(socket: Socket, data: PeerRoomDto) {
-    const { userId, roomId, email, nickname, peerId } = data;
+    const { userId, roomId, peerId } = data;
     const room = await this.roomsService.findRoomById(roomId);
     console.log('peerId: ', peerId);
     console.log(room.roomUniqueId);

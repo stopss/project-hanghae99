@@ -81,10 +81,10 @@ export class RoomsService {
   }
 
   // 방 찾기
-  async searchRoom(body: SearchRoomDto) {
-    const { type, inputValue } = body;
-    console.log(type, inputValue);
-
+  async searchRoom(query: SearchRoomDto) {
+    const { type, inputValue } = query;
+    console.log("확인", type, inputValue);
+    
     let roomList;
     if (type == 'TITLE') {
       roomList = await this.roomsRepository
