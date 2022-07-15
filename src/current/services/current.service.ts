@@ -18,8 +18,8 @@ export class CurrentUsersService {
     if (userReadyState.readyState === true) {
       user.readyState = false;
       await this.currentUsersRepository.update(
-        { id: userId },
-        { readyState: true },
+        { userId },
+        { readyState: false },
       );
       const users = await this.currentUsersRepository.find({
         where: { roomId },
@@ -108,6 +108,17 @@ export class CurrentUsersService {
       { hintReady: true },
     );
     return updated;
+  }
+
+  async hintRegister(userId: number, imageId: string) {
+    const user = await this.currentUsersRepository.findOne({
+      where: { userId },
+    });
+    const hintLists: string =
+      user.hintLists === undefined
+        ? `${imageId}`
+        : user.hintLists + `,${imageId}`;
+    return await this.currentUsersRepository.update({ userId }, { hintLists });
   }
 
   async exitRoom(userId: number) {

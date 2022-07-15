@@ -7,6 +7,7 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -32,6 +33,9 @@ export class CurrentUserEntity {
 
   @Column({ default: false })
   hintReady: boolean;
+
+  @Column({ nullable: true })
+  hintLists: string;
 
   @ManyToOne(() => UserEntity, (user) => user.users)
   @JoinColumn([{ name: 'userId', referencedColumnName: 'id' }])

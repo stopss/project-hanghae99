@@ -121,4 +121,17 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ) {
     return this.chatService.hintStart(socket, +data.userId, +data.roomId);
   }
+
+  @SubscribeMessage('hint_register')
+  handleHintRegister(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() data: { roomId: string; userId: string; imageId: string },
+  ) {
+    return this.chatService.hintRegister(
+      socket,
+      +data.userId,
+      +data.roomId,
+      data.imageId,
+    );
+  }
 }
