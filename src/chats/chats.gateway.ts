@@ -134,4 +134,20 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       data.imageId,
     );
   }
+
+  @SubscribeMessage('reasoning_time')
+  handleReasoningTime(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() data: { roomId: string },
+  ) {
+    return this.chatService.reasoningTime(socket, +data.roomId);
+  }
+
+  @SubscribeMessage('hint_board')
+  handleHintInBoard(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() data: { x: string; y: string; roomId: string },
+  ) {
+    return this.chatService.hintInBoard(socket, data.x, data.y, +data.roomId);
+  }
 }

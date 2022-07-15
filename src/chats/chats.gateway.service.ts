@@ -391,4 +391,32 @@ export class ChatService {
       currentUser,
     });
   }
+
+  async reasoningTime(socket: Socket, roomId: number) {
+    const room = await this.roomsService.findRoomById(roomId);
+    const payload = {
+      title: room.title,
+      password: room.password,
+      hintTime: room.hintTime,
+      reasoningTime: room.reasoningTime,
+      isRandom: room.isRandom,
+      count: room.count,
+      roomUniqueId: room.roomUniqueId,
+      roomState: 'reasoningTime',
+      master: room.master,
+      userId: room.userId,
+      hintReady: room.hintReady,
+    };
+    await this.roomsService.updateRoom(roomId, payload);
+    const roomInfo = await this.roomsService.findRoomById(roomId);
+    const currentUser = await this.currentUsersService.currentUsers(roomId);
+    socket.to(room.roomUniqueId).emit('update_room', { roomInfo, currentUser });
+    socket.emit('update_room', { roomInfo, currentUser });
+  }
+
+  async hintInBoard(socket: Socket, x: string, y: string, roomId: number) {
+    const room = await this.roomsService.findRoomById(roomId);
+    socket.to(room.roomUniqueId).emit('update_room', { x, y });
+    socket.emit('update_room', { x, y });
+  }
 }
