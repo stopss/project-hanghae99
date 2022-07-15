@@ -18,8 +18,8 @@ export class CurrentUsersService {
     if (userReadyState.readyState === true) {
       user.readyState = false;
       await this.currentUsersRepository.update(
-        { id: userId },
-        { readyState: true },
+        { userId },
+        { readyState: false },
       );
       const users = await this.currentUsersRepository.find({
         where: { roomId },
@@ -110,10 +110,33 @@ export class CurrentUsersService {
     return updated;
   }
 
+  async hintRegister(userId: number, imageId: string) {
+    const user = await this.currentUsersRepository.findOne({
+      where: { userId },
+    });
+    const hintLists: string =
+      user.hintLists === undefined
+        ? `${imageId}`
+        : user.hintLists + `,${imageId}`;
+    return await this.currentUsersRepository.update({ userId }, { hintLists });
+  }
+
   async exitRoom(userId: number) {
     const user = new CurrentUserEntity();
     // user.userId = userId;
     const result = this.currentUsersRepository.delete({ userId: userId });
     return result;
+  }
+
+  async vote(votedUserId: number) {
+    const votedUser = await this.currentUsersRepository.findOne({
+      where: { userId: votedUserId },
+    });
+
+    const voteCount = votedUser.vote + 1;
+    return await this.currentUsersRepository.update(
+      { userId: votedUserId },
+      { vote: voteCount },
+    );
   }
 }
