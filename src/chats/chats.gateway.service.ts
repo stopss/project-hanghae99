@@ -10,6 +10,7 @@ import { ExitRoomDto } from './dto/exit.room.dto';
 import { UpdateRoomDto } from './dto/update.room.dto';
 import { CreateRoomDto } from './dto/create.room.dto';
 import { PeerRoomDto } from './dto/peer.room.dto';
+import { HintDto } from './dto/hint.dto';
 
 @Injectable()
 export class ChatService {
@@ -414,9 +415,8 @@ export class ChatService {
     socket.emit('update_room', { roomInfo, currentUser });
   }
 
-  async hintInBoard(socket: Socket, x: string, y: string, roomId: number) {
+  async hintInBoard(socket: Socket, roomInfo: HintDto, roomId: number) {
     const room = await this.roomsService.findRoomById(roomId);
-    socket.to(room.roomUniqueId).emit('update_room', { x, y });
-    socket.emit('update_room', { x, y });
+    socket.to(room.roomUniqueId).emit('update_room', roomInfo);
   }
 }

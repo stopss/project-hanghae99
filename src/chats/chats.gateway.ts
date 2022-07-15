@@ -14,6 +14,7 @@ import { ExitRoomDto } from './dto/exit.room.dto';
 import { UpdateRoomDto } from './dto/update.room.dto';
 import { CreateRoomDto } from './dto/create.room.dto';
 import { PeerRoomDto } from './dto/peer.room.dto';
+import { HintDto } from './dto/hint.dto';
 
 @WebSocketGateway({
   transports: ['websocket'],
@@ -146,8 +147,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('hint_board')
   handleHintInBoard(
     @ConnectedSocket() socket: Socket,
-    @MessageBody() data: { x: string; y: string; roomId: string },
+    @MessageBody() data: { roomInfo: HintDto; roomId: string },
   ) {
-    return this.chatService.hintInBoard(socket, data.x, data.y, +data.roomId);
+    return this.chatService.hintInBoard(socket, data.roomInfo, +data.roomId);
   }
 }
