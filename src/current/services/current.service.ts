@@ -127,4 +127,16 @@ export class CurrentUsersService {
     const result = this.currentUsersRepository.delete({ userId: userId });
     return result;
   }
+
+  async vote(votedUserId: number) {
+    const votedUser = await this.currentUsersRepository.findOne({
+      where: { userId: votedUserId },
+    });
+
+    const voteCount = votedUser.vote + 1;
+    return await this.currentUsersRepository.update(
+      { userId: votedUserId },
+      { vote: voteCount },
+    );
+  }
 }

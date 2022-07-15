@@ -37,6 +37,9 @@ export class CurrentUserEntity {
   @Column({ nullable: true })
   hintLists: string;
 
+  @Column({ default: 0 })
+  vote: number;
+
   @ManyToOne(() => UserEntity, (user) => user.users)
   @JoinColumn([{ name: 'userId', referencedColumnName: 'id' }])
   user: UserEntity;
