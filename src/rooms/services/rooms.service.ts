@@ -76,6 +76,7 @@ export class RoomsService {
 
   // 방 목록
   async getAllRoom(): Promise<any> {
+    console.log('getAllRoom');
     const roomList = await this.roomsRepository.find();
     return { result: { roomList } };
   }
@@ -83,8 +84,8 @@ export class RoomsService {
   // 방 찾기
   async searchRoom(query: SearchRoomDto) {
     const { type, inputValue } = query;
-    console.log("확인", type, inputValue);
-    
+    console.log('확인', type, inputValue);
+
     let roomList;
     if (type == 'TITLE') {
       roomList = await this.roomsRepository

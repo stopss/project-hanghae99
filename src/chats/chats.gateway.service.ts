@@ -81,6 +81,7 @@ export class ChatService {
     socket
       .to(room.roomUniqueId)
       .emit('new_chat', { message: `${nickname}: ${message}` });
+    socket.emit('new_chat', { message: `${nickname}: ${message}` });
   }
 
   async roomList(socket: Socket) {
@@ -135,15 +136,35 @@ export class ChatService {
     socket
       .to(room.roomUniqueId)
       .emit('update_room', { roomInfo: room, currentUser: result });
+    socket.to(room.roomUniqueId).emit('user_connected');
   }
 
   async peerJoin(socket: Socket, data: PeerRoomDto) {
-    const { userId, roomId, peerId } = data;
+    const { roomId, peerId } = data;
     const room = await this.roomsService.findRoomById(roomId);
     console.log('peerId: ', peerId);
     console.log(room.roomUniqueId);
     socket.join(room.roomUniqueId);
-    socket.broadcast.to(room.roomUniqueId).emit('user_connected', peerId);
+    // socket.broadcast.to(room.roomUniqueId).emit('user_connected', peerId);
+  }
+
+  async offer(socket: Socket, data) {
+    const { offer, roomId } = data;
+    const room = await this.roomsService.findRoomById(roomId);
+    socket.to(room.roomUniqueId).emit('offer', offer);
+  }
+
+  async answer(socket: Socket, data) {
+    const { answer, roomId } = data;
+    const room = await this.roomsService.findRoomById(roomId);
+    socket.to(room.roomUniqueId).emit('answer', answer);
+  }
+
+  async ice(socket: Socket, data) {
+    const { ice, roomId } = data;
+    console.log('ice', ice);
+    const room = await this.roomsService.findRoomById(roomId);
+    socket.to(room.roomUniqueId).emit('ice', ice);
   }
 
   async exit(socket: Socket, data: ExitRoomDto) {
@@ -250,7 +271,7 @@ export class ChatService {
     socket
       .to(room.roomUniqueId)
       .emit('update_room', { roomInfo: room, currentUser: result });
-    socket.emit('update_room', { roomInfo: room, curretUser: result });
+    socket.emit('update_room', { roomInfo: room, currentUser: result });
   }
 
   async start(socket: Socket, userId: string, roomId: string) {
@@ -308,7 +329,7 @@ export class ChatService {
     let result = [];
     for (let i = 0; i < currentUser.length; i++) {
       result.push(await this.usersService.findUserById(currentUser[i].userId));
-      result[i].readyState = currentUser[i].readyState;
+      result[i].hintReady = currentUser[i].hintReady;
       delete result[i].password;
     }
     const payload = {
@@ -414,9 +435,11 @@ export class ChatService {
     socket.emit('update_room', { roomInfo, currentUser });
   }
 
-  async hintInBoard(socket: Socket, x: string, y: string, roomId: number) {
+  async hintInBoard(socket: Socket, imageInfo: any, roomId: number) {
+    console.log(imageInfo);
     const room = await this.roomsService.findRoomById(roomId);
-    socket.to(room.roomUniqueId).emit('update_room', { x, y });
-    socket.emit('update_room', { x, y });
+    socket.to(room.roomUniqueId).emit('board_image', imageInfo);
+    socket.emit('board_image', imageInfo);
+    // socket.emit('update_room', imageInfo);
   }
 }

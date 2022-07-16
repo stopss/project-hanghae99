@@ -115,9 +115,7 @@ export class CurrentUsersService {
       where: { userId },
     });
     const hintLists: string =
-      user.hintLists === undefined
-        ? `${imageId}`
-        : user.hintLists + `,${imageId}`;
+      user.hintLists === null ? `${imageId}` : user.hintLists + `,${imageId}`;
     return await this.currentUsersRepository.update({ userId }, { hintLists });
   }
 

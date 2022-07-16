@@ -5,10 +5,10 @@ import { Controller, Get, Param, Post } from '@nestjs/common';
 export class CurrentController {
   constructor(private readonly currentUsersService: CurrentUsersService) {}
 
-  @Get('/:id')
-  test(@Param('id') id: number) {
-    return this.currentUsersService.currentUsers(id);
-  }
+  // @Get('/:id')
+  // test(@Param('id') id: number) {
+  //   return this.currentUsersService.currentUsers(id);
+  // }
 
   @Post('/vote/:votedUserId')
   vote(@Param('votedUserId') votedUserId: string) {
