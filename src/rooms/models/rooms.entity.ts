@@ -2,11 +2,13 @@ import { CurrentUserEntity } from 'src/current/models/current.users.entity';
 import { UserEntity } from 'src/users/models/users.entity';
 import {
   Column,
+  CreateDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 
 @Entity('Room')
@@ -46,6 +48,12 @@ export class RoomEntity {
 
   @Column({ default: 0 })
   hintReady: number;
+  
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 
   @ManyToOne(() => UserEntity, (user) => user.rooms)
   @JoinColumn([{ name: 'userId', referencedColumnName: 'id' }])

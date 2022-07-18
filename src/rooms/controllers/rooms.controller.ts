@@ -37,7 +37,7 @@ export class RoomsController {
   }
 
   @Get('/rooms')
-  roomGetAll(): Promise<any> {
+  roomGetAll() {
     return this.roomsService.getAllRoom();
   }
 

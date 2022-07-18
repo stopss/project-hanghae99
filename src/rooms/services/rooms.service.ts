@@ -75,7 +75,7 @@ export class RoomsService {
   }
 
   // 방 목록
-  async getAllRoom(): Promise<any> {
+  async getAllRoom() {
     const roomList = await this.roomsRepository.find();
     return { result: { roomList } };
   }
@@ -92,10 +92,15 @@ export class RoomsService {
         .where('Room.title LIKE :title', { title: `%${inputValue}%` })
         .getMany();
       console.log(roomList);
-    } else {
+    } else if(type == 'NICKNAME') {
       roomList = await this.roomsRepository
         .createQueryBuilder('Room')
         .where('Room.master LIKE :master', { master: `%${inputValue}%` })
+        .getMany();
+    } else if(type == 'STATE') {
+      roomList = await this.roomsRepository
+        .createQueryBuilder('Room')
+        .where('Room.roomState LIKE :roomState', { roomState: `%${inputValue}%` })
         .getMany();
     }
     return { result: { success: true, roomList } };
