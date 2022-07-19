@@ -102,8 +102,11 @@ export class ChatService {
   }
 
   async join(socket: Socket, data: JoinRoomDto) {
-    const { userId, roomId, email, nickname } = data;
+    const { userId, roomId, email, nickname, password } = data;
     const room = await this.roomsService.findRoomById(roomId);
+    // 비밀번호 체크
+    const chkpassword = await this.roomsService.chkPassordRoom(roomId, password);
+    
     if (room.count === 5) throw new WsException('참가인원이 꽉 찼습니다.');
     const payload = {
       title: room.title,
