@@ -94,6 +94,7 @@ export class ChatService {
     const currentUser = await this.currentUsersService.userJoinRoom(
       room.userId,
       data.roomId,
+      data.streamId,
     );
     const user = await this.usersService.findUserById(currentUser.userId);
     socket.join(data.roomUniqueId);
@@ -102,9 +103,8 @@ export class ChatService {
   }
 
   async join(socket: Socket, data: JoinRoomDto) {
-    const { userId, roomId, email, nickname, password } = data;
+    const { userId, roomId, email, nickname, password, streamId } = data;
     const room = await this.roomsService.findRoomById(roomId);
-    // 비밀번호 체크
     const chkpassword = await this.roomsService.chkPassordRoom(roomId, password);
     
     if (room.count === 5) throw new WsException('참가인원이 꽉 찼습니다.');
@@ -122,7 +122,7 @@ export class ChatService {
       hintReady: room.hintReady,
     };
     await this.roomsService.updateRoom(room.id, payload);
-    await this.currentUsersService.userJoinRoom(userId, room.id);
+    await this.currentUsersService.userJoinRoom(userId, room.id, streamId);
 
     socket.join(room.roomUniqueId);
     socket.to(room.roomUniqueId).emit('new_chat', {

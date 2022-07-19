@@ -40,6 +40,9 @@ export class CurrentUserEntity {
   @Column({ default: 0 })
   vote: number;
 
+  @Column({ nullable: true })
+  streamId: string;
+
   @ManyToOne(() => UserEntity, (user) => user.users)
   @JoinColumn([{ name: 'userId', referencedColumnName: 'id' }])
   user: UserEntity;

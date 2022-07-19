@@ -15,4 +15,7 @@ export class JoinRoomDto {
 
   @IsString()
   password: string;
+
+  @IsString()
+  streamId: string;
 }

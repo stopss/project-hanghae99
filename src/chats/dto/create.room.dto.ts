@@ -6,4 +6,7 @@ export class CreateRoomDto {
 
   @IsString()
   roomUniqueId: string;
+
+  @IsString()
+  streamId: string;
 }
