@@ -1,4 +1,3 @@
-import { RoomsService } from './../../rooms/services/rooms.service';
 import { Inject, Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { CurrentUserEntity } from '../models/current.users.entity';
@@ -144,5 +143,12 @@ export class CurrentUsersService {
     return await this.currentUsersRepository.delete({
       userId: kickedUserId,
     });
+  }
+
+  async choiceRole(roomId: number, selectedUserId: number, role: number) {
+    return await this.currentUsersRepository.update(
+      { userId: selectedUserId },
+      { episodeId: role },
+    );
   }
 }

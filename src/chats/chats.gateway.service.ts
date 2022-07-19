@@ -10,6 +10,7 @@ import { ExitRoomDto } from './dto/exit.room.dto';
 import { UpdateRoomDto } from './dto/update.room.dto';
 import { CreateRoomDto } from './dto/create.room.dto';
 import { PeerRoomDto } from './dto/peer.room.dto';
+import { EpisodeService } from 'src/episode/episode.service';
 
 @Injectable()
 export class ChatService {
@@ -17,6 +18,7 @@ export class ChatService {
     private readonly roomsService: RoomsService,
     private readonly usersService: UsersService,
     private readonly currentUsersService: CurrentUsersService,
+    private readonly episodeService: EpisodeService,
   ) {}
   private logger = new Logger('CHATTING');
 
@@ -447,10 +449,36 @@ export class ChatService {
     await this.currentUsersService.kickUser(roomId, kickedUserId);
     const roomInfo = await this.roomsService.findRoomById(roomId);
     const currentUser = await this.currentUsersService.currentUsers(roomId);
+
     socket.to(room.roomUniqueId).emit('update_room', { roomInfo, currentUser });
+    socket.emit('update_room', { roomInfo, currentUser });
+
+    socket.to(room.roomUniqueId).emit('new_chat', {
+      message: `${kickedUser.nickname}님이 강퇴당했습니다.`,
+    });
     socket.emit('new_chat', {
       message: `${kickedUser.nickname}님이 강퇴당했습니다.`,
     });
-    socket.emit('update_room', { roomInfo, currentUser });
+  }
+
+  async choiceRole(
+    socket: Socket,
+    roomId: number,
+    selectedUserId: number,
+    role: string,
+  ) {
+    const episode = await this.episodeService.findEpisodeByRole(role);
+    if (episode.length === 1) return new WsException('이미 선택된 역할입니다.');
+    await this.currentUsersService.choiceRole(
+      roomId,
+      selectedUserId,
+      episode[0].id,
+    );
+    const currentUser = await this.currentUsersService.currentUsers(roomId);
+    const room = await this.roomsService.findRoomById(roomId);
+    socket.emit('new_chat', { message: `${episode[0].role}을 선택했습니다.` });
+    socket
+      .to(room.roomUniqueId)
+      .emit('update_room', { roomInfo: room, currentUser });
   }
 }
