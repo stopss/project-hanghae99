@@ -481,4 +481,43 @@ export class ChatService {
       .to(room.roomUniqueId)
       .emit('update_room', { roomInfo: room, currentUser });
   }
+
+  async forceQuit(socket: Socket, roomId: number, exitedUserId: number) {
+    const room = await this.roomsService.findRoomById(roomId);
+    const user = await this.usersService.findUserById(exitedUserId);
+    if (user.nickname !== room.master) {
+      // 그냥 유저가 나갔을 때
+      const payload = {
+        title: room.title,
+        password: room.password,
+        hintTime: room.hintTime,
+        reasoningTime: room.reasoningTime,
+        isRandom: room.isRandom,
+        count: room.count - 1,
+        roomUniqueId: room.roomUniqueId,
+        roomState: 'standby',
+        master: room.master,
+        userId: room.userId,
+        hintReady: 0,
+      };
+
+      await this.currentUsersService.exitRoom(exitedUserId);
+      await this.roomsService.updateRoom(roomId, payload);
+      const roomInfo = await this.roomsService.findRoomById(roomId);
+      const currentUser = await this.currentUsersService.currentUsers(roomId);
+      socket
+        .to(room.roomUniqueId)
+        .emit('update_room', { roomInfo, currentUser });
+      socket.to(room.roomUniqueId).emit('new_chat', {
+        message: `${user.nickname}님이 퇴장하여 게임을 강제종료 합니다.`,
+      });
+    } else {
+      // 방장이 나갔을 때 방 삭제
+      await this.roomsService.deleteRoom(roomId);
+      await this.currentUsersService.deleteRoom(roomId);
+      socket.to(room.roomUniqueId).emit('new_chat', {
+        message: `${user.nickname}님이 퇴장하여 게임을 강제종료 합니다.`,
+      });
+    }
+  }
 }

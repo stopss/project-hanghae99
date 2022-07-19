@@ -151,4 +151,8 @@ export class CurrentUsersService {
       { episodeId: role },
     );
   }
+
+  async deleteRoom(roomId: number) {
+    return await this.currentUsersRepository.delete(roomId);
+  }
 }

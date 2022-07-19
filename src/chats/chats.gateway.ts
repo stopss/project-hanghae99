@@ -177,4 +177,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       data.role,
     );
   }
+
+  @SubscribeMessage('force_quit')
+  handleForceQuit(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() data: { roomId: string; userId: string },
+  ) {
+    return this.chatService.forceQuit(socket, +data.roomId, +data.userId);
+  }
 }
