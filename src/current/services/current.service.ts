@@ -124,7 +124,7 @@ export class CurrentUsersService {
   async exitRoom(userId: number) {
     const user = new CurrentUserEntity();
     // user.userId = userId;
-    const result = this.currentUsersRepository.delete({ userId: userId });
+    const result = await this.currentUsersRepository.delete({ userId: userId });
     return result;
   }
 
@@ -138,5 +138,11 @@ export class CurrentUsersService {
       { userId: votedUserId },
       { vote: voteCount },
     );
+  }
+
+  async kickUser(roomId: number, kickedUserId: number) {
+    return await this.currentUsersRepository.delete({
+      userId: kickedUserId,
+    });
   }
 }

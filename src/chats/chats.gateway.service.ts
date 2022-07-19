@@ -419,4 +419,38 @@ export class ChatService {
     socket.to(room.roomUniqueId).emit('update_room', { x, y });
     socket.emit('update_room', { x, y });
   }
+
+  async kickUser(
+    socket: Socket,
+    roomId: number,
+    kickedUserId: number,
+    masterUserId: number,
+  ) {
+    const room = await this.roomsService.findRoomById(roomId);
+    const kickedUser = await this.usersService.findUserById(kickedUserId);
+    if (room.userId !== masterUserId)
+      return new WsException('방장만 강퇴시킬 수 있음');
+    const payload = {
+      title: room.title,
+      password: room.password,
+      hintTime: room.hintTime,
+      reasoningTime: room.reasoningTime,
+      isRandom: room.isRandom,
+      count: room.count - 1,
+      roomUniqueId: room.roomUniqueId,
+      roomState: room.roomState,
+      master: room.master,
+      userId: room.userId,
+      hintReady: room.hintReady,
+    };
+    await this.roomsService.updateRoom(roomId, payload);
+    await this.currentUsersService.kickUser(roomId, kickedUserId);
+    const roomInfo = await this.roomsService.findRoomById(roomId);
+    const currentUser = await this.currentUsersService.currentUsers(roomId);
+    socket.to(room.roomUniqueId).emit('update_room', { roomInfo, currentUser });
+    socket.emit('new_chat', {
+      message: `${kickedUser.nickname}님이 강퇴당했습니다.`,
+    });
+    socket.emit('update_room', { roomInfo, currentUser });
+  }
 }
