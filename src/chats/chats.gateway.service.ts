@@ -11,6 +11,7 @@ import { UpdateRoomDto } from './dto/update.room.dto';
 import { CreateRoomDto } from './dto/create.room.dto';
 import { PeerRoomDto } from './dto/peer.room.dto';
 import { HintDto } from './dto/hint.dto';
+import { EpisodeService } from 'src/episode/episode.service';
 
 @Injectable()
 export class ChatService {
@@ -18,6 +19,7 @@ export class ChatService {
     private readonly roomsService: RoomsService,
     private readonly usersService: UsersService,
     private readonly currentUsersService: CurrentUsersService,
+    private readonly episodeService: EpisodeService,
   ) {}
   private logger = new Logger('CHATTING');
 
@@ -418,5 +420,104 @@ export class ChatService {
   async hintInBoard(socket: Socket, roomInfo: HintDto, roomId: number) {
     const room = await this.roomsService.findRoomById(roomId);
     socket.to(room.roomUniqueId).emit('update_room', roomInfo);
+  }
+
+  async kickUser(
+    socket: Socket,
+    roomId: number,
+    kickedUserId: number,
+    masterUserId: number,
+  ) {
+    const room = await this.roomsService.findRoomById(roomId);
+    const kickedUser = await this.usersService.findUserById(kickedUserId);
+    if (room.userId !== masterUserId)
+      return new WsException('방장만 강퇴시킬 수 있음');
+    const payload = {
+      title: room.title,
+      password: room.password,
+      hintTime: room.hintTime,
+      reasoningTime: room.reasoningTime,
+      isRandom: room.isRandom,
+      count: room.count - 1,
+      roomUniqueId: room.roomUniqueId,
+      roomState: room.roomState,
+      master: room.master,
+      userId: room.userId,
+      hintReady: room.hintReady,
+    };
+    await this.roomsService.updateRoom(roomId, payload);
+    await this.currentUsersService.kickUser(roomId, kickedUserId);
+    const roomInfo = await this.roomsService.findRoomById(roomId);
+    const currentUser = await this.currentUsersService.currentUsers(roomId);
+
+    socket.to(room.roomUniqueId).emit('update_room', { roomInfo, currentUser });
+    socket.emit('update_room', { roomInfo, currentUser });
+
+    socket.to(room.roomUniqueId).emit('new_chat', {
+      message: `${kickedUser.nickname}님이 강퇴당했습니다.`,
+    });
+    socket.emit('new_chat', {
+      message: `${kickedUser.nickname}님이 강퇴당했습니다.`,
+    });
+  }
+
+  async choiceRole(
+    socket: Socket,
+    roomId: number,
+    selectedUserId: number,
+    role: string,
+  ) {
+    const episode = await this.episodeService.findEpisodeByRole(role);
+    if (episode.length === 1) return new WsException('이미 선택된 역할입니다.');
+    await this.currentUsersService.choiceRole(
+      roomId,
+      selectedUserId,
+      episode[0].id,
+    );
+    const currentUser = await this.currentUsersService.currentUsers(roomId);
+    const room = await this.roomsService.findRoomById(roomId);
+    socket.emit('new_chat', { message: `${episode[0].role}을 선택했습니다.` });
+    socket
+      .to(room.roomUniqueId)
+      .emit('update_room', { roomInfo: room, currentUser });
+  }
+
+  async forceQuit(socket: Socket, roomId: number, exitedUserId: number) {
+    const room = await this.roomsService.findRoomById(roomId);
+    const user = await this.usersService.findUserById(exitedUserId);
+    if (user.nickname !== room.master) {
+      // 그냥 유저가 나갔을 때
+      const payload = {
+        title: room.title,
+        password: room.password,
+        hintTime: room.hintTime,
+        reasoningTime: room.reasoningTime,
+        isRandom: room.isRandom,
+        count: room.count - 1,
+        roomUniqueId: room.roomUniqueId,
+        roomState: 'standby',
+        master: room.master,
+        userId: room.userId,
+        hintReady: 0,
+      };
+
+      await this.currentUsersService.exitRoom(exitedUserId);
+      await this.roomsService.updateRoom(roomId, payload);
+      const roomInfo = await this.roomsService.findRoomById(roomId);
+      const currentUser = await this.currentUsersService.currentUsers(roomId);
+      socket
+        .to(room.roomUniqueId)
+        .emit('update_room', { roomInfo, currentUser });
+      socket.to(room.roomUniqueId).emit('new_chat', {
+        message: `${user.nickname}님이 퇴장하여 게임을 강제종료 합니다.`,
+      });
+    } else {
+      // 방장이 나갔을 때 방 삭제
+      await this.roomsService.deleteRoom(roomId);
+      await this.currentUsersService.deleteRoom(roomId);
+      socket.to(room.roomUniqueId).emit('new_chat', {
+        message: `${user.nickname}님이 퇴장하여 게임을 강제종료 합니다.`,
+      });
+    }
   }
 }

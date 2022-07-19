@@ -4,9 +4,10 @@ import { ChatGateway } from './chats.gateway';
 import { ChatService } from './chats.gateway.service';
 import { UsersModule } from 'src/users/users.module';
 import { CurrentUsersModule } from './../current/current.users.module';
+import { EpisodeModule } from 'src/episode/episode.module';
 
 @Module({
-  imports: [RoomsModule, UsersModule, CurrentUsersModule],
+  imports: [RoomsModule, UsersModule, CurrentUsersModule, EpisodeModule],
   providers: [ChatGateway, ChatService],
 })
 export class ChatsModule {}

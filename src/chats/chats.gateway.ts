@@ -151,4 +151,39 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ) {
     return this.chatService.hintInBoard(socket, data.roomInfo, +data.roomId);
   }
+
+  @SubscribeMessage('kick_user')
+  handleKickUser(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody()
+    data: { roomId: string; kickedUserId: string; masterUserId: string },
+  ) {
+    return this.chatService.kickUser(
+      socket,
+      +data.roomId,
+      +data.kickedUserId,
+      +data.masterUserId,
+    );
+  }
+
+  @SubscribeMessage('choice_role')
+  hanldeChoiceRole(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() data: { roomId: string; userId: string; role: string },
+  ) {
+    return this.chatService.choiceRole(
+      socket,
+      +data.roomId,
+      +data.userId,
+      data.role,
+    );
+  }
+
+  @SubscribeMessage('force_quit')
+  handleForceQuit(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() data: { roomId: string; userId: string },
+  ) {
+    return this.chatService.forceQuit(socket, +data.roomId, +data.userId);
+  }
 }
