@@ -23,9 +23,8 @@ export class RoomsService {
   async findRoomById(id: number): Promise<any> {
     const result = await this.roomsRepository.findOne({ where: { id } });
     if (!result) {
-      throw new NotFoundException('존재하지 않는 방입니다.');
+      throw new HttpException('존재하지 않는 방입니다.', 401);
     }
-
     return result;
   }
 
@@ -54,9 +53,6 @@ export class RoomsService {
   // 방 수정하기
   async updateRoom(id: number, body: UpdateRoomDto) {
     const existRoom = await this.findRoomById(id);
-    if (!existRoom) {
-      throw new HttpException('존재하지 않는 방입니다.', 401);
-    }
 
     const result = await this.roomsRepository.update(id, body);
     return { result: { success: true, ...result } };
@@ -65,9 +61,6 @@ export class RoomsService {
   // 방 삭제하기
   async deleteRoom(id: number) {
     const existRoom = await this.findRoomById(id);
-    if (!existRoom) {
-      throw new HttpException('존재하지 않는 방입니다.', 401);
-    }
 
     await this.roomsRepository.delete(id);
 
@@ -104,5 +97,13 @@ export class RoomsService {
         .getMany();
     }
     return { result: { success: true, roomList } };
+  }
+
+  // 방 비밀번호 체크
+  async chkPassordRoom(roomId: number, password: string) {
+    const room = await this.findRoomById(roomId);
+    if ( room.password !== password) {
+      return { result: { success: false}};
+    } else return { result: { success: true }};
   }
 }

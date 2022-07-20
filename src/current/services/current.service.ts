@@ -72,10 +72,11 @@ export class CurrentUsersService {
     return users;
   }
 
-  async userJoinRoom(userId: number, roomId: number) {
+  async userJoinRoom(userId: number, roomId: number, streamId: string) {
     const newJoiner = new CurrentUserEntity();
     newJoiner.roomId = roomId;
     newJoiner.userId = userId;
+    newJoiner.streamId = streamId;
     const result = await this.currentUsersRepository.save(newJoiner);
     return result;
   }
