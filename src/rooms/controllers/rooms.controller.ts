@@ -45,4 +45,9 @@ export class RoomsController {
   roomSearch(@Query() query) {
     return this.roomsService.searchRoom(query);
   }
+
+  @Post('/room/chkpassword/:roomId')
+  roomChkPassword(@Param('roomId') id: string, @Body() body) {
+    return this.roomsService.chkPasswordRoom(parseInt(id), body);
+  }
 }

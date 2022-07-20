@@ -14,8 +14,5 @@ export class JoinRoomDto {
   roomId: number;
 
   @IsString()
-  password: string;
-
-  @IsString()
   streamId: string;
 }
