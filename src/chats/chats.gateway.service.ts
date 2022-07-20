@@ -105,8 +105,10 @@ export class ChatService {
   async join(socket: Socket, data: JoinRoomDto) {
     const { userId, roomId, email, nickname, password, streamId } = data;
     const room = await this.roomsService.findRoomById(roomId);
-    const chkpassword = await this.roomsService.chkPassordRoom(roomId, password);
-    
+    if (password !== null ) {
+      const chkpassword = await this.roomsService.chkPassordRoom(roomId, password);
+      if (chkpassword.result.success === false) throw new WsException('비밀번호가 맞지 않습니다.');
+    }
     if (room.count === 5) throw new WsException('참가인원이 꽉 찼습니다.');
     const payload = {
       title: room.title,

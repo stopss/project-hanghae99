@@ -103,7 +103,7 @@ export class RoomsService {
   async chkPassordRoom(roomId: number, password: string) {
     const room = await this.findRoomById(roomId);
     if ( room.password !== password) {
-      return { result: { success: false, msg: "비밀번호가 맞지 않습니다." }};
+      return { result: { success: false}};
     } else return { result: { success: true }};
   }
 }
