@@ -42,6 +42,7 @@ export class RoomsService {
     room.master = master;
     room.roomUniqueId = uuidv4().toString();
     room.userId = user.id;
+    room.banUsers = "";
 
     const newRoom = await this.roomsRepository.save(room);
     const result = { ...newRoom };
@@ -108,5 +109,12 @@ export class RoomsService {
     }
 
     return { result: { success: true }}
+  }
+
+  async banUsers(id: number, kickedUserId: number) {
+    const room = await this.findRoomById(id);
+
+    if(room.banUsers === '') return await this.roomsRepository.update(id, { banUsers: kickedUserId.toString() });
+    else return await this.roomsRepository.update(id, { banUsers: room.banUsers + ',' + kickedUserId });
   }
 }

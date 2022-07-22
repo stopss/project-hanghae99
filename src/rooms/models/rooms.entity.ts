@@ -48,6 +48,9 @@ export class RoomEntity {
 
   @Column({ default: 0 })
   hintReady: number;
+
+  @Column({ nullable: true })
+  banUsers: string;
   
   @CreateDateColumn()
   createdAt: Date;

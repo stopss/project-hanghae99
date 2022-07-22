@@ -448,6 +448,7 @@ export class ChatService {
       hintReady: room.hintReady,
     };
     await this.roomsService.updateRoom(roomId, payload);
+    await this.roomsService.banUsers(roomId, kickedUserId);
     await this.currentUsersService.kickUser(roomId, kickedUserId);
     const roomInfo = await this.roomsService.findRoomById(roomId);
     const currentUser = await this.currentUsersService.currentUsers(roomId);

@@ -36,7 +36,7 @@ export class RoomsController {
     return this.roomsService.deleteRoom(parseInt(id));
   }
 
-  @Get('/rooms')
+  @Get('/room/list')
   roomGetAll() {
     return this.roomsService.getAllRoom();
   }
@@ -49,5 +49,10 @@ export class RoomsController {
   @Post('/room/chkpassword/:roomId')
   roomChkPassword(@Param('roomId') id: string, @Body() body) {
     return this.roomsService.chkPasswordRoom(parseInt(id), body);
+  }
+
+  @Put('/room/ban/:roomId')
+  roomBanUser(@Param('roomId') id: string, @Body() body) {
+    return this.roomsService.banUsers(parseInt(id), body.userId);
   }
 }
