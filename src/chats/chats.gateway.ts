@@ -91,6 +91,22 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ) {
     return this.chatService.peerJoin(socket, data);
   }
+
+  @SubscribeMessage('offer')
+  handleOffer(@ConnectedSocket() socket: Socket, @MessageBody() data) {
+    return this.chatService.offer(socket, data);
+  }
+
+  @SubscribeMessage('answer')
+  handleAnswer(@ConnectedSocket() socket: Socket, @MessageBody() data) {
+    return this.chatService.answer(socket, data);
+  }
+
+  @SubscribeMessage('ice')
+  handleIce(@ConnectedSocket() socket: Socket, @MessageBody() data) {
+    return this.chatService.ice(socket, data);
+  }
+
   @SubscribeMessage('ready_state')
   handleReady(
     @ConnectedSocket() socket: Socket,
@@ -147,9 +163,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('hint_board')
   handleHintInBoard(
     @ConnectedSocket() socket: Socket,
-    @MessageBody() data: { roomInfo: HintDto; roomId: string },
+    @MessageBody()
+    data: {
+      imageInfo: any;
+      roomId: string;
+    },
   ) {
-    return this.chatService.hintInBoard(socket, data.roomInfo, +data.roomId);
+    return this.chatService.hintInBoard(socket, data.imageInfo, +data.roomId);
   }
 
   @SubscribeMessage('kick_user')

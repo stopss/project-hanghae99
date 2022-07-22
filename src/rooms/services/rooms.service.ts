@@ -42,7 +42,7 @@ export class RoomsService {
     room.master = master;
     room.roomUniqueId = uuidv4().toString();
     room.userId = user.id;
-    room.banUsers = "";
+    room.banUsers = '';
 
     const newRoom = await this.roomsRepository.save(room);
     const result = { ...newRoom };
@@ -77,8 +77,8 @@ export class RoomsService {
   // 방 찾기
   async searchRoom(query: SearchRoomDto) {
     const { type, inputValue } = query;
-    console.log("확인", type, inputValue);
-    
+    console.log('확인', type, inputValue);
+
     let roomList;
     if (type == 'TITLE') {
       roomList = await this.roomsRepository
@@ -86,15 +86,17 @@ export class RoomsService {
         .where('Room.title LIKE :title', { title: `%${inputValue}%` })
         .getMany();
       console.log(roomList);
-    } else if(type == 'NICKNAME') {
+    } else if (type == 'NICKNAME') {
       roomList = await this.roomsRepository
         .createQueryBuilder('Room')
         .where('Room.master LIKE :master', { master: `%${inputValue}%` })
         .getMany();
-    } else if(type == 'STATE') {
+    } else if (type == 'STATE') {
       roomList = await this.roomsRepository
         .createQueryBuilder('Room')
-        .where('Room.roomState LIKE :roomState', { roomState: `%${inputValue}%` })
+        .where('Room.roomState LIKE :roomState', {
+          roomState: `%${inputValue}%`,
+        })
         .getMany();
     }
     return { result: { success: true, roomList } };
@@ -104,17 +106,23 @@ export class RoomsService {
   async chkPasswordRoom(id: number, body) {
     const { password } = body;
     const room = await this.findRoomById(id);
-    if(room.password !== password) {
-      return { result: { success: false, error: '비밀번호가 맞지 않습니다.'}}
+    if (room.password !== password) {
+      return { result: { success: false, error: '비밀번호가 맞지 않습니다.' } };
     }
 
-    return { result: { success: true }}
+    return { result: { success: true } };
   }
 
   async banUsers(id: number, kickedUserId: number) {
     const room = await this.findRoomById(id);
 
-    if(room.banUsers === '') return await this.roomsRepository.update(id, { banUsers: kickedUserId.toString() });
-    else return await this.roomsRepository.update(id, { banUsers: room.banUsers + ',' + kickedUserId });
+    if (room.banUsers === '')
+      return await this.roomsRepository.update(id, {
+        banUsers: kickedUserId.toString(),
+      });
+    else
+      return await this.roomsRepository.update(id, {
+        banUsers: room.banUsers + ',' + kickedUserId,
+      });
   }
 }
