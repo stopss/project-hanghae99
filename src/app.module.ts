@@ -11,10 +11,15 @@ import { CurrentUsersModule } from './current/current.users.module';
 import { EpisodeModule } from './episode/episode.module';
 import { ImagesModule } from './images/images.module';
 import { LogModule } from './log/log.module';
+import { ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    ThrottlerModule.forRoot({
+      ttl: 60,
+      limit: 10,
+    }),
     AuthModule,
     UsersModule,
     RoomsModule,
