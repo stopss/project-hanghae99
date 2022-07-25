@@ -14,4 +14,9 @@ export class AppController {
       data: 'Chattings',
     };
   }
+
+  @Get('/test')
+  test() {
+    return 'hello world!!!!!';
+  }
 }

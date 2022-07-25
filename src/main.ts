@@ -7,6 +7,8 @@ import { join } from 'path';
 import helmet from 'helmet';
 import * as fs from 'fs';
 import * as csurf from 'csurf';
+import * as cookieParser from 'cookie-parser';
+import * as session from 'express-session';
 
 async function bootstrap() {
   const httpsOptions = {
@@ -18,6 +20,14 @@ async function bootstrap() {
     httpsOptions,
   });
   app.enableCors();
+  app.use(cookieParser());
+  app.use(
+    session({
+      secret: 'my-secret',
+      resave: false,
+      saveUninitialized: false,
+    }),
+  );
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalFilters(new HttpExceptionFilter());
   app.setBaseViewsDir(join(__dirname, '../views'));
