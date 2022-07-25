@@ -8,9 +8,14 @@ import { AuthModule } from 'src/auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from 'src/auth/jwt/constants';
 import { LogModule } from 'src/log/log.module';
+import { ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
   imports: [
+    ThrottlerModule.forRoot({
+      ttl: 60,
+      limit: 10,
+    }),
     DatabaseModule,
     JwtModule.register({
       secret: jwtConstants.secret,

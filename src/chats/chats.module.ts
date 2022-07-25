@@ -5,9 +5,19 @@ import { ChatService } from './chats.gateway.service';
 import { UsersModule } from 'src/users/users.module';
 import { CurrentUsersModule } from './../current/current.users.module';
 import { EpisodeModule } from 'src/episode/episode.module';
+import { ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
-  imports: [RoomsModule, UsersModule, CurrentUsersModule, EpisodeModule],
+  imports: [
+    ThrottlerModule.forRoot({
+      ttl: 60,
+      limit: 10,
+    }),
+    RoomsModule,
+    UsersModule,
+    CurrentUsersModule,
+    EpisodeModule,
+  ],
   providers: [ChatGateway, ChatService],
 })
 export class ChatsModule {}
