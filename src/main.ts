@@ -15,30 +15,33 @@ async function bootstrap() {
     key: fs.readFileSync(__dirname + '/../src/secrets/private-key.pem'),
     cert: fs.readFileSync(__dirname + '/../src/secrets/public-certificate.pem'),
   };
-  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+  const appHttps = await NestFactory.create<NestExpressApplication>(AppModule, {
     cors: true,
     httpsOptions,
   });
-  app.enableCors();
-  app.use(cookieParser());
-  app.use(
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, { cors: true });
+  appHttps.enableCors();
+  appHttps.use(cookieParser());
+  appHttps.use(
     session({
       secret: 'my-secret',
       resave: false,
       saveUninitialized: false,
     }),
   );
-  app.useGlobalPipes(new ValidationPipe());
-  app.useGlobalFilters(new HttpExceptionFilter());
-  app.setBaseViewsDir(join(__dirname, '../views'));
-  app.useStaticAssets(join(__dirname, '../public'));
-  app.setViewEngine('hbs');
-  app.use(helmet());
-  app.use(csurf());
+  appHttps.useGlobalPipes(new ValidationPipe());
+  appHttps.useGlobalFilters(new HttpExceptionFilter());
+  appHttps.setBaseViewsDir(join(__dirname, '../views'));
+  appHttps.useStaticAssets(join(__dirname, '../public'));
+  appHttps.setViewEngine('hbs');
+  appHttps.use(helmet());
+  appHttps.use(csurf());
 
-  const PORT = process.env.PORT;
-  await app.listen(PORT);
   const logger = new Logger('MAIN');
-  logger.log(`The server is on`);
+
+  const HTTPS_SERVER_PORT = process.env.HTTPS_SERVER_PORT;
+  const SOCKET_SERVER_PORT = process.env.SOCKET_SERVER_PORT;
+  await appHttps.listen(HTTPS_SERVER_PORT).then(() => logger.log(`The server is on ${HTTPS_SERVER_PORT}`));
+  await app.listen(SOCKET_SERVER_PORT).then(() => logger.log(`The Socket server is on ${SOCKET_SERVER_PORT}`));
 }
 bootstrap();
