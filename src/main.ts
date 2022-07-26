@@ -11,11 +11,6 @@ import * as cookieParser from 'cookie-parser';
 import * as session from 'express-session';
 
 async function bootstrap() {
-<<<<<<< HEAD
-  const app = await NestFactory.create(AppModule);
-  await app.listen(8080);
-  console.log('8080번에서 대기중.....');
-=======
   const httpsOptions = {
     key: fs.readFileSync(__dirname + '/../src/secrets/private-key.pem'),
     cert: fs.readFileSync(__dirname + '/../src/secrets/public-certificate.pem'),
@@ -24,7 +19,9 @@ async function bootstrap() {
     cors: true,
     httpsOptions,
   });
-  const app = await NestFactory.create<NestExpressApplication>(AppModule, { cors: true });
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+    cors: true,
+  });
   appHttps.enableCors();
   appHttps.use(cookieParser());
   appHttps.use(
@@ -46,8 +43,11 @@ async function bootstrap() {
 
   const HTTPS_SERVER_PORT = process.env.HTTPS_SERVER_PORT;
   const SOCKET_SERVER_PORT = process.env.SOCKET_SERVER_PORT;
-  await appHttps.listen(HTTPS_SERVER_PORT).then(() => logger.log(`The server is on ${HTTPS_SERVER_PORT}`));
-  await app.listen(SOCKET_SERVER_PORT).then(() => logger.log(`The Socket server is on ${SOCKET_SERVER_PORT}`));
->>>>>>> setup-packages
+  await appHttps
+    .listen(HTTPS_SERVER_PORT)
+    .then(() => logger.log(`The server is on ${HTTPS_SERVER_PORT}`));
+  await app
+    .listen(SOCKET_SERVER_PORT)
+    .then(() => logger.log(`The Socket server is on ${SOCKET_SERVER_PORT}`));
 }
 bootstrap();
