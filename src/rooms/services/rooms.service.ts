@@ -70,7 +70,7 @@ export class RoomsService {
 
   // 방 목록
   async getAllRoom() {
-    const roomList = await this.roomsRepository.find();
+    const roomList = await this.roomsRepository.find({ order: { id: 'DESC' }});
     return { result: { roomList } };
   }
 
