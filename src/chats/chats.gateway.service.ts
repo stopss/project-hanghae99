@@ -68,8 +68,11 @@ export class ChatService {
     const currentUser = await this.currentUsersService.currentUsers(+roomId);
     let users = [];
     for (let i = 0; i < currentUser.length; i++) {
+      await this.currentUsersService.readyStateInit(currentUser[i].userId);
       users.push(await this.usersService.findUserById(currentUser[i].userId));
-      users[i].readyState = currentUser[i].readyState;
+      // users.push(await this.usersService.findUserById(currentUser[i].userId));
+      // users[i].readyState = currentUser[i].readyState;
+      users[i].readyState = false;
       delete users[i].password;
     }
     socket

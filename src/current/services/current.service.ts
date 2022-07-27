@@ -72,6 +72,10 @@ export class CurrentUsersService {
     return users;
   }
 
+  async readyStateInit(userId: number) {
+    return await this.currentUsersRepository.update({ userId }, { readyState: false })
+  }
+
   async userJoinRoom(userId: number, roomId: number, streamId: string) {
     const newJoiner = new CurrentUserEntity();
     newJoiner.roomId = roomId;
