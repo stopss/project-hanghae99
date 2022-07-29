@@ -8,4 +8,5 @@ RUN npm run build
 FROM node:10-alpine
 WORKDIR /app
 COPY --from=builder /app ./
+RUN npm run build
 CMD ["npm", "run", "start:prod"]
