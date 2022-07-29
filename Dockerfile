@@ -11,4 +11,5 @@ COPY --from=builder /app ./
 RUN npm install
 COPY ./ ./
 RUN npm run build
-CMD ["npm", "run", "start:prod"]
+RUN npm run start:dev
+# CMD ["npm", "run", "start:prod"]
