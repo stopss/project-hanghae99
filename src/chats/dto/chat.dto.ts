@@ -14,4 +14,7 @@ export class ChatDto {
 
   @IsString()
   nickname: string;
+
+  @IsString()
+  at: string;
 }

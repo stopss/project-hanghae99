@@ -55,7 +55,15 @@ export class RoomsService {
   async updateRoom(id: number, body: UpdateRoomDto) {
     const existRoom = await this.findRoomById(id);
 
-    const result = await this.roomsRepository.update(id, body);
+    const result = await this.roomsRepository
+      .update(id, body)
+      .then((res) => {
+        console.log('성공');
+        return res;
+      })
+      .catch(() => {
+        console.log('error');
+      });
     return { result: { success: true, ...result } };
   }
 
@@ -70,7 +78,7 @@ export class RoomsService {
 
   // 방 목록
   async getAllRoom() {
-    const roomList = await this.roomsRepository.find({ order: { id: 'DESC' }});
+    const roomList = await this.roomsRepository.find({ order: { id: 'DESC' } });
     return { result: { roomList } };
   }
 
