@@ -17,7 +17,7 @@ jobs:
         with:
           node-version: '16.13'
       - run: npm ci
-      - run: npm run start:prod
+      # - run: npm run build
   build-image:
     runs-on: ubuntu-latest
     steps:
