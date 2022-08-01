@@ -110,7 +110,9 @@ export class ChatService {
     socket.emit('new_chat', { message: '방을 생성합니다.', roomInfo: room });
     socket.emit('update_room', {
       roomInfo: room,
-      currentUser: [{ ...user, ...currentUser }, user, currentUser],
+      currentUser: [{ ...user, ...currentUser }],
+      user,
+      current_user: currentUser,
     });
   }
 
