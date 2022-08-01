@@ -36,12 +36,7 @@ async function bootstrap() {
   const logger = new Logger('MAIN');
 
   const HTTPS_SERVER_PORT = process.env.HTTPS_SERVER_PORT;
-  const SOCKET_SERVER_PORT = process.env.SOCKET_SERVER_PORT;
-  await appHttps
-    .listen(HTTPS_SERVER_PORT)
-    .then(() => logger.log(`The server is on ${HTTPS_SERVER_PORT}`));
-  await app
-    .listen(SOCKET_SERVER_PORT)
-    .then(() => logger.log(`The Socket server is on ${SOCKET_SERVER_PORT}`));
+  await appHttps.listen(HTTPS_SERVER_PORT);
+  logger.debug(`The server is on HTTPS(${HTTPS_SERVER_PORT})`);
 }
 bootstrap();
