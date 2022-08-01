@@ -131,6 +131,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     return this.chatService.hintReady(socket, +data.userId, +data.roomId);
   }
 
+  @SubscribeMessage('role_choice_time')
+  handleRoleChoiceTime(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() data: { roomId: string },
+  ) {
+    return this.chatService.hintRoleChoiceTime(socket, +data.roomId);
+  }
+
   @SubscribeMessage('hint_start')
   handleHintStart(
     @ConnectedSocket() socket: Socket,
