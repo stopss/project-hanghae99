@@ -22,4 +22,7 @@ export class ChatDto {
   @IsString()
   @Transform((value) => sanitizeHtml(value))
   nickname: string;
+
+  @IsString()
+  at: string;
 }

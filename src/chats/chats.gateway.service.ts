@@ -68,8 +68,14 @@ export class ChatService {
     const currentUser = await this.currentUsersService.currentUsers(+roomId);
     let users = [];
     for (let i = 0; i < currentUser.length; i++) {
-      users.push(await this.usersService.findUserById(currentUser[i].userId));
-      users[i].readyState = currentUser[i].readyState;
+      await this.currentUsersService.readyStateInit(currentUser[i].userId);
+      users.push({
+        ...(await this.usersService.findUserById(currentUser[i].userId)),
+        ...currentUser[i],
+      });
+      // users.push(await this.usersService.findUserById(currentUser[i].userId));
+      // users[i].readyState = currentUser[i].readyState;
+      users[i].readyState = false;
       delete users[i].password;
     }
     socket
@@ -79,12 +85,12 @@ export class ChatService {
   }
 
   async chats(chat: ChatDto, socket: Socket) {
-    const { message, nickname, roomId } = chat;
+    const { message, userId, roomId, at } = chat;
     const room = await this.roomsService.findRoomById(roomId);
-    socket
-      .to(room.roomUniqueId)
-      .emit('new_chat', { message: `${nickname}: ${message}` });
-    socket.emit('new_chat', { message: `${nickname}: ${message}` });
+    const user = await this.usersService.findUserById(userId);
+
+    socket.to(room.roomUniqueId).emit('new_chat', { message, user, at });
+    socket.emit('new_chat', { message, user, at });
   }
 
   async roomList(socket: Socket) {
@@ -102,7 +108,10 @@ export class ChatService {
     const user = await this.usersService.findUserById(currentUser.userId);
     socket.join(data.roomUniqueId);
     socket.emit('new_chat', { message: '방을 생성합니다.', roomInfo: room });
-    socket.emit('update_room', { roomInfo: room, currentUser: [user] });
+    socket.emit('update_room', {
+      roomInfo: room,
+      currentUser: [{ ...user, ...currentUser }],
+    });
   }
 
   async join(socket: Socket, data: JoinRoomDto) {
@@ -128,12 +137,15 @@ export class ChatService {
 
     socket.join(room.roomUniqueId);
     socket.to(room.roomUniqueId).emit('new_chat', {
-      message: `${nickname}(${email})님이 입장하셨습니다.`,
+      message: `${nickname}님이 입장하셨습니다.`,
     });
     const currentUser = await this.currentUsersService.currentUsers(roomId);
     let result = [];
     for (let i = 0; i < currentUser.length; i++) {
-      result.push(await this.usersService.findUserById(currentUser[i].userId));
+      result.push({
+        ...(await this.usersService.findUserById(currentUser[i].userId)),
+        ...currentUser[i],
+      });
       result[i].readyState = currentUser[i].readyState;
       delete result[i].password;
     }
@@ -141,7 +153,7 @@ export class ChatService {
     socket
       .to(room.roomUniqueId)
       .emit('update_room', { roomInfo: room, currentUser: result });
-    socket.to(room.roomUniqueId).emit('user_connected');
+    // socket.to(room.roomUniqueId).emit('user_connected');
   }
 
   async peerJoin(socket: Socket, data: PeerRoomDto) {
@@ -192,9 +204,10 @@ export class ChatService {
         }
         let result = [];
         for (let i = 0; i < currentUser.length; i++) {
-          result.push(
-            await this.usersService.findUserById(currentUser[i].userId),
+          const user = await this.usersService.findUserById(
+            currentUser[i].userId,
           );
+          result.push({ ...user, ...currentUser[i] });
           result[i].readyState = currentUser[i].readyState;
           delete result[i].password;
         }
@@ -208,7 +221,7 @@ export class ChatService {
           count: parseInt(room.count) - 1,
           master: result[newMasterNo - 1].nickname,
           roomUniqueId: room.roomUniqueId,
-          userId: result[newMasterNo - 1].id,
+          userId: result[newMasterNo - 1].userId,
           roomState: room.roomState,
           hintReady: room.hintReady,
         };
@@ -244,9 +257,10 @@ export class ChatService {
       const currentUser = await this.currentUsersService.currentUsers(+roomId);
       let result = [];
       for (let i = 0; i < currentUser.length; i++) {
-        result.push(
-          await this.usersService.findUserById(currentUser[i].userId),
-        );
+        result.push({
+          ...(await this.usersService.findUserById(currentUser[i].userId)),
+          ...currentUser[i],
+        });
         result[i].readyState = currentUser[i].readyState;
         delete result[i].password;
       }
@@ -269,7 +283,10 @@ export class ChatService {
     const room = await this.roomsService.findRoomById(+roomId);
     let result = [];
     for (let i = 0; i < users.length; i++) {
-      result.push(await this.usersService.findUserById(users[i].userId));
+      result.push({
+        ...(await this.usersService.findUserById(users[i].userId)),
+        ...users[i],
+      });
       result[i].readyState = users[i].readyState;
       delete result[i].password;
     }
@@ -310,7 +327,10 @@ export class ChatService {
     const currentUser = await this.currentUsersService.currentUsers(+roomId);
     let result = [];
     for (let i = 0; i < currentUser.length; i++) {
-      result.push(await this.usersService.findUserById(currentUser[i].userId));
+      result.push({
+        ...(await this.usersService.findUserById(currentUser[i].userId)),
+        ...currentUser[i],
+      });
       result[i].readyState = currentUser[i].readyState;
       delete result[i].password;
     }
@@ -333,7 +353,10 @@ export class ChatService {
     const currentUser = await this.currentUsersService.currentUsers(roomId);
     let result = [];
     for (let i = 0; i < currentUser.length; i++) {
-      result.push(await this.usersService.findUserById(currentUser[i].userId));
+      result.push({
+        ...(await this.usersService.findUserById(currentUser[i].userId)),
+        ...currentUser[i],
+      });
       result[i].hintReady = currentUser[i].hintReady;
       delete result[i].password;
     }
@@ -391,7 +414,10 @@ export class ChatService {
     const currentUser = await this.currentUsersService.currentUsers(roomId);
     let result = [];
     for (let i = 0; i < currentUser.length; i++) {
-      result.push(await this.usersService.findUserById(currentUser[i].userId));
+      result.push({
+        ...(await this.usersService.findUserById(currentUser[i].userId)),
+        ...currentUser[i],
+      });
       result[i].readyState = currentUser[i].readyState;
       delete result[i].password;
     }
@@ -411,14 +437,25 @@ export class ChatService {
       imageId,
     );
     const currentUser = await this.currentUsersService.currentUsers(roomId);
-    socket.emit('new_chat', {
+    let result = [];
+    for (let i = 0; i < currentUser.length; i++) {
+      result.push({
+        ...(await this.usersService.findUserById(currentUser[i].userId)),
+        ...currentUser[i],
+      });
+      result[i].readyState = currentUser[i].readyState;
+      delete result[i].password;
+    }
+
+    socket.emit('update_room', {
       roomInfo: room,
       hintLists: hintRegisterResult,
-      currentUser,
+      currentUser: result,
     });
   }
 
   async reasoningTime(socket: Socket, roomId: number) {
+    console.log('reasoning time', roomId);
     const room = await this.roomsService.findRoomById(roomId);
     const payload = {
       title: room.title,
@@ -436,14 +473,29 @@ export class ChatService {
     await this.roomsService.updateRoom(roomId, payload);
     const roomInfo = await this.roomsService.findRoomById(roomId);
     const currentUser = await this.currentUsersService.currentUsers(roomId);
-    socket.to(room.roomUniqueId).emit('update_room', { roomInfo, currentUser });
-    socket.emit('update_room', { roomInfo, currentUser });
+
+    let result = [];
+    for (let i = 0; i < currentUser.length; i++) {
+      result.push({
+        ...(await this.usersService.findUserById(currentUser[i].userId)),
+        ...currentUser[i],
+      });
+      result[i].readyState = currentUser[i].readyState;
+      delete result[i].password;
+    }
+
+    console.log(roomInfo);
+
+    socket
+      .to(room.roomUniqueId)
+      .emit('update_room', { roomInfo, currentUser: result });
+    socket.emit('update_room', { roomInfo, currentUser: result });
   }
 
-  async hintInBoard(socket: Socket, roomInfo: HintDto, roomId: number) {
+  async hintInBoard(socket: Socket, imageInfo: HintDto, roomId: number) {
     const room = await this.roomsService.findRoomById(roomId);
-    socket.to(room.roomUniqueId).emit('update_room', roomInfo);
-    socket.emit('update_room', roomInfo);
+    socket.to(room.roomUniqueId).emit('hint_board', imageInfo);
+    socket.emit('hint_board', imageInfo);
   }
 
   async kickUser(
@@ -475,8 +527,22 @@ export class ChatService {
     const roomInfo = await this.roomsService.findRoomById(roomId);
     const currentUser = await this.currentUsersService.currentUsers(roomId);
 
-    socket.to(room.roomUniqueId).emit('update_room', { roomInfo, currentUser });
-    socket.emit('update_room', { roomInfo, currentUser });
+    let result = [];
+    for (let i = 0; i < currentUser.length; i++) {
+      result.push({
+        ...(await this.usersService.findUserById(currentUser[i].userId)),
+        ...currentUser[i],
+      });
+      result[i].readyState = currentUser[i].readyState;
+      delete result[i].password;
+    }
+
+    console.log('kick user', result);
+
+    socket
+      .to(room.roomUniqueId)
+      .emit('update_room', { roomInfo, currentUser: result });
+    socket.emit('update_room', { roomInfo, currentUser: result });
 
     socket.to(room.roomUniqueId).emit('new_chat', {
       message: `${kickedUser.nickname}님이 강퇴당했습니다.`,
@@ -501,10 +567,21 @@ export class ChatService {
     );
     const currentUser = await this.currentUsersService.currentUsers(roomId);
     const room = await this.roomsService.findRoomById(roomId);
+
+    let result = [];
+    for (let i = 0; i < currentUser.length; i++) {
+      result.push({
+        ...(await this.usersService.findUserById(currentUser[i].userId)),
+        ...currentUser[i],
+      });
+      result[i].readyState = currentUser[i].readyState;
+      delete result[i].password;
+    }
     socket.emit('new_chat', { message: `${episode[0].role}을 선택했습니다.` });
     socket
       .to(room.roomUniqueId)
-      .emit('update_room', { roomInfo: room, currentUser });
+      .emit('update_room', { roomInfo: room, currentUser: result });
+    socket.emit('update_room', { roomInfo: room, currentUser: result });
   }
 
   async forceQuit(socket: Socket, roomId: number, exitedUserId: number) {
@@ -530,9 +607,20 @@ export class ChatService {
       await this.roomsService.updateRoom(roomId, payload);
       const roomInfo = await this.roomsService.findRoomById(roomId);
       const currentUser = await this.currentUsersService.currentUsers(roomId);
+
+      let result = [];
+      for (let i = 0; i < currentUser.length; i++) {
+        result.push({
+          ...(await this.usersService.findUserById(currentUser[i].userId)),
+          ...currentUser[i],
+        });
+        result[i].readyState = currentUser[i].readyState;
+        delete result[i].password;
+      }
+
       socket
         .to(room.roomUniqueId)
-        .emit('update_room', { roomInfo, currentUser });
+        .emit('update_room', { roomInfo, currentUser: result });
       socket.to(room.roomUniqueId).emit('new_chat', {
         message: `${user.nickname}님이 퇴장하여 게임을 강제종료 합니다.`,
       });
