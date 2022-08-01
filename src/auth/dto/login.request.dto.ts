@@ -4,10 +4,8 @@ import * as sanitizeHtml from 'sanitize-html';
 
 export class LoginUserDto {
   @IsEmail()
-  @Transform((value) => sanitizeHtml(value))
   email: string;
 
   @IsString()
-  @Transform((value) => sanitizeHtml(value))
   password: string;
 }
