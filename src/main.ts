@@ -6,9 +6,9 @@ import { AppModule } from './app.module';
 import { join } from 'path';
 import helmet from 'helmet';
 import * as fs from 'fs';
-import * as csurf from 'csurf';
-import * as cookieParser from 'cookie-parser';
-import * as session from 'express-session';
+// import * as csurf from 'csurf';
+// import * as cookieParser from 'cookie-parser';
+// import * as session from 'express-session';
 
 async function bootstrap() {
   const httpsOptions = {
@@ -28,21 +28,21 @@ async function bootstrap() {
     methods: 'GET, HEAD, PUT, PATCH, POST, DELETE, OPTIONS',
     credentials: true,
   });
-  appHttps.use(cookieParser());
-  appHttps.use(
-    session({
-      secret: 'my-secret',
-      resave: false,
-      saveUninitialized: false,
-    }),
-  );
+  // appHttps.use(cookieParser());
+  // appHttps.use(
+  //   session({
+  //     secret: 'my-secret',
+  //     resave: false,
+  //     saveUninitialized: false,
+  //   }),
+  // );
   appHttps.useGlobalPipes(new ValidationPipe());
   appHttps.useGlobalFilters(new HttpExceptionFilter());
   appHttps.setBaseViewsDir(join(__dirname, '../views'));
   appHttps.useStaticAssets(join(__dirname, '../public'));
   appHttps.setViewEngine('hbs');
   appHttps.use(helmet());
-  appHttps.use(csurf());
+  // appHttps.use(csurf());
 
   const logger = new Logger('MAIN');
 
