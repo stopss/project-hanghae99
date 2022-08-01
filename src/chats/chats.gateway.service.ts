@@ -100,21 +100,25 @@ export class ChatService {
 
   async create(socket: Socket, data: CreateRoomDto) {
     const room = await this.roomsService.findRoomById(data.roomId);
-    const currentUser = await this.currentUsersService
-      .userJoinRoom(room.userId, data.roomId, data.streamId)
-      .then((res) => console.log(res))
-      .catch((err) => err);
+    const currentUser = await this.currentUsersService.userJoinRoom(
+      room.userId,
+      data.roomId,
+      data.streamId,
+    );
     const user = await this.usersService
       .findUserById(currentUser.userId)
       .then((res) => console.log(res))
       .catch((err) => err);
+    const current_user = await this.currentUsersService.currentUsers(
+      data.roomId,
+    );
     socket.join(data.roomUniqueId);
     socket.emit('new_chat', { message: '방을 생성합니다.', roomInfo: room });
     socket.emit('update_room', {
       roomInfo: room,
       currentUser: [{ ...user, ...currentUser }],
       user,
-      current_user: currentUser,
+      current_user,
     });
   }
 
