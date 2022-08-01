@@ -1,6 +1,10 @@
 import { UsersService } from '../users/services/users.service';
 import * as bcrypt from 'bcrypt';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  ConsoleLogger,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { LoginUserDto } from './dto/login.request.dto';
 import { JwtService } from '@nestjs/jwt';
 
@@ -12,6 +16,7 @@ export class AuthService {
   ) {}
 
   async jwtLogin(data: LoginUserDto) {
+    console.log(data);
     const { email, password } = data;
     const user = await this.usersService.findUserByEmail(email);
     if (!user) {

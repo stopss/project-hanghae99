@@ -33,6 +33,7 @@ export class UsersController {
 
   @Post('/local/login')
   login(@Body() body: LoginUserDto) {
+    console.log(body);
     return this.authService.jwtLogin(body);
   }
 
