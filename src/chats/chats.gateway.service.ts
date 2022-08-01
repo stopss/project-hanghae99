@@ -395,6 +395,28 @@ export class ChatService {
     });
   }
 
+  async hintRoleChoiceTime(socket: Socket, roomId: number) {
+    const room = await this.roomsService.findRoomById(roomId);
+
+    const payload = { ...room, roomState: 'roleChoice' };
+    await this.roomsService.updateRoom(roomId, payload);
+    const roomInfo = await this.roomsService.findRoomById(roomId);
+    const currentUser = await this.currentUsersService.currentUsers(roomId);
+    let result = [];
+    for (let i = 0; i < currentUser.length; i++) {
+      result.push({
+        ...(await this.usersService.findUserById(currentUser[i].userId)),
+        ...currentUser[i],
+      });
+      result[i].readyState = currentUser[i].readyState;
+      delete result[i].password;
+    }
+    socket
+      .to(room.roomUniqueId)
+      .emit('update_room', { roomInfo, currentUser: result });
+    socket.emit('update_room', { roomInfo, currentUser: result });
+  }
+
   async hintStart(socket: Socket, userId: number, roomId: number) {
     const room = await this.roomsService.findRoomById(roomId);
     // if (room.hintReady !== 2) {
@@ -429,8 +451,10 @@ export class ChatService {
       result[i].readyState = currentUser[i].readyState;
       delete result[i].password;
     }
-    socket.to(room.roomUniqueId).emit('update_room', { roomInfo, currentUser });
-    socket.emit('update_room', { roomInfo, currentUser });
+    socket
+      .to(room.roomUniqueId)
+      .emit('update_room', { roomInfo, currentUser: result });
+    socket.emit('update_room', { roomInfo, currentUser: result });
   }
 
   async hintRegister(

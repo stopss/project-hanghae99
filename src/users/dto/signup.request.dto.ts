@@ -4,7 +4,7 @@ export class SignupUserDto {
   @IsString()
   nickname: string;
 
-  @IsEmail()
+  @IsString()
   email: string;
 
   @IsString()
