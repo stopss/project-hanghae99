@@ -12,8 +12,9 @@ import * as session from 'express-session';
 
 async function bootstrap() {
   const httpsOptions = {
-    key: fs.readFileSync(__dirname + '/../src/secrets/private-key.pem'),
-    cert: fs.readFileSync(__dirname + '/../src/secrets/public-certificate.pem'),
+    ca: fs.readFileSync('/etc/letsencrypt/live/whoru-back.kr/fullchain.pem'),
+    key: fs.readFileSync('/etc/letsencrypt/live/whoru-back.kr/privkey.pem'),
+    cert: fs.readFileSync('/etc/letsencrypt/live/whoru-back.kr/cert.pem'),
   };
   const appHttps = await NestFactory.create<NestExpressApplication>(AppModule, {
     cors: true,
@@ -22,7 +23,11 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     cors: true,
   });
-  appHttps.enableCors();
+  appHttps.enableCors({
+    origin: 'https:whoru.name',
+    methods: 'GET, HEAD, PUT, PATCH, POST, DELETE, OPTIONS',
+    credentials: true,
+  });
   appHttps.use(cookieParser());
   appHttps.use(
     session({
