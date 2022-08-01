@@ -106,6 +106,7 @@ export class ChatService {
       data.streamId,
     );
     const user = await this.usersService.findUserById(currentUser.userId);
+    this.logger.log(`[DEBUG] ${user} ${currentUser}`);
     socket.join(data.roomUniqueId);
     socket.emit('new_chat', { message: '방을 생성합니다.', roomInfo: room });
     socket.emit('update_room', {
