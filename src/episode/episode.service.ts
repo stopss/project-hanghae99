@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { EpisodeEntity } from './episode.entity';
 
@@ -16,7 +16,13 @@ export class EpisodeService {
   }
 
   async allRole() {
-    const roles = await this.episodeRepository.find();
+    const roles = await this.episodeRepository
+      .find()
+      .then((res) => res)
+      .catch((err) => {
+        const logger = new Logger();
+        logger.error('all roles error', err);
+      });
     return roles;
   }
 
