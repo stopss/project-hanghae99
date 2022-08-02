@@ -373,19 +373,7 @@ export class ChatService {
       result[i].hintReady = currentUser[i].hintReady;
       delete result[i].password;
     }
-    const payload = {
-      title: room.title,
-      password: room.password,
-      hintTime: room.hintTime,
-      reasoningTime: room.reasoningTime,
-      isRandom: room.isRandom,
-      count: room.count,
-      roomUniqueId: room.roomUniqueId,
-      roomState: room.roomState,
-      master: room.master,
-      userId: room.userId,
-      hintReady: room.hintReady + 1,
-    };
+    const payload = { ...room, hintReady: room.hintReady + 1 };
     await this.roomsService.updateRoom(roomId, payload);
     const resultRoom = await this.roomsService.findRoomById(roomId);
     socket.to(room.roomUniqueId).emit('update_room', {
@@ -425,26 +413,30 @@ export class ChatService {
 
   async hintStart(socket: Socket, userId: number, roomId: number) {
     const room = await this.roomsService.findRoomById(roomId);
-    // if (room.hintReady !== 2) {
-    //   throw new WsException(
-    //     '모든 유저가 준비완료가 되어야 시작할 수 있습니다.',
-    //   );
-    // }
+    if (room.hintReady < 5) {
+      const users = await this.currentUsersService.currentUsers(roomId);
+      const notReadyUser = users.filter((user) => user.hintReady === false);
+      let selectedRole: Array<number>;
+      users.forEach((user) => {
+        if (user.episodeId !== null) {
+          selectedRole.push(user.episodeId);
+        }
+      });
+
+      notReadyUser.forEach(async (user, index) => {
+        await this.currentUsersService.hint(user.userId);
+        if (!selectedRole.includes(index + 1)) {
+          await this.currentUsersService.choiceRole(
+            roomId,
+            user.userId,
+            index + 1,
+          );
+        }
+      });
+    }
     // TODO: 게임시작하면 GameLog에 게임 로그 기록
 
-    const payload = {
-      title: room.title,
-      password: room.password,
-      hintTime: room.hintTime,
-      reasoningTime: room.reasoningTime,
-      isRandom: room.isRandom,
-      count: room.count,
-      roomUniqueId: room.roomUniqueId,
-      roomState: 'hintTime',
-      master: room.master,
-      userId: room.userId,
-      hintReady: room.hintReady,
-    };
+    const payload = { ...room, roomState: 'hintTime' };
     await this.roomsService.updateRoom(roomId, payload);
     const roomInfo = await this.roomsService.findRoomById(roomId);
     const currentUser = await this.currentUsersService.currentUsers(roomId);
