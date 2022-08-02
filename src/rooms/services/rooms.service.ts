@@ -2,6 +2,7 @@ import {
   HttpException,
   Inject,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { Like, Repository } from 'typeorm';
@@ -59,6 +60,8 @@ export class RoomsService {
       .update(id, body)
       .then((res) => {
         console.log('성공');
+        const logger = new Logger('DEBUG');
+        logger.debug('room state', body.roomState);
         return res;
       })
       .catch(() => {
