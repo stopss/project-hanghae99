@@ -413,26 +413,32 @@ export class ChatService {
 
   async hintStart(socket: Socket, userId: number, roomId: number) {
     const room = await this.roomsService.findRoomById(roomId);
-    if (room.hintReady < 5) {
-      const users = await this.currentUsersService.currentUsers(roomId);
-      const notReadyUser = users.filter((user) => user.hintReady === false);
-      let selectedRole: Array<number>;
-      users.forEach((user) => {
-        if (user.episodeId !== null) {
-          selectedRole.push(user.episodeId);
-        }
-      });
+    const currentUsers = await this.currentUsersService.currentUsers(roomId);
 
-      notReadyUser.forEach(async (user, index) => {
-        await this.currentUsersService.hint(user.userId);
-        if (!selectedRole.includes(index + 1)) {
-          await this.currentUsersService.choiceRole(
-            roomId,
-            user.userId,
-            index + 1,
-          );
-        }
-      });
+    const selectedEpisodeId: Array<number> = [];
+    const notSelectUserId: Array<number> = [];
+    const notSelectedEpisodeId: Array<number> = [];
+
+    currentUsers.forEach((user) => {
+      if (user.episodeId !== null) selectedEpisodeId.push(user.episodeId);
+      else notSelectUserId.push(user.userId);
+    });
+
+    console.log('selectedEpisodeId', selectedEpisodeId);
+    console.log('notSelectUserId', notSelectUserId);
+
+    if (selectedEpisodeId.length < 2) {
+      for (let i = 0; i < 5; i++) {
+        if (!selectedEpisodeId.includes(i + 1))
+          notSelectedEpisodeId.push(i + 1);
+      }
+      for (let i = 0; i < notSelectUserId.length; i++) {
+        await this.currentUsersService.choiceRole(
+          roomId,
+          notSelectUserId[i],
+          notSelectedEpisodeId[i],
+        );
+      }
     }
     // TODO: 게임시작하면 GameLog에 게임 로그 기록
 
@@ -613,7 +619,6 @@ export class ChatService {
 
     this.loggerDebug.debug('ChoiceRole', room, result);
 
-    socket.emit('new_chat', { message: `${episode[0].role}을 선택했습니다.` });
     socket
       .to(room.roomUniqueId)
       .emit('update_room', { roomInfo: room, currentUser: result });
