@@ -593,9 +593,10 @@ export class ChatService {
     const episode = await this.episodeService.findEpisodeById(episodeId);
     if (!episode) return new WsException('존재하지 않는 역할입니다.');
     const isExistRole = await this.currentUsersService.findUserByEpisodeId(
+      roomId,
       episodeId,
     );
-    if (isExistRole) throw new WsException('이미 선택된 역할입니다.');
+    if (isExistRole === null) throw new WsException('이미 선택된 역할입니다.');
     await this.currentUsersService.choiceRole(
       roomId,
       selectedUserId,

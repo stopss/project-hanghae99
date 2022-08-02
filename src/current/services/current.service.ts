@@ -42,11 +42,15 @@ export class CurrentUsersService {
     }
   }
 
-  async findUserByEpisodeId(episodeId: number) {
-    const user = await this.currentUsersRepository.findOne({
-      where: { episodeId },
+  async findUserByEpisodeId(roomId: number, episodeId: number) {
+    const rooms = await this.currentUsersRepository.find({ where: { roomId } });
+    const result = rooms.forEach((room) => {
+      if (room.episodeId === episodeId) return null;
     });
-    return user;
+    // const user = await this.currentUsersRepository.findOne({
+    //   where: { episodeId },
+    // });
+    return true;
   }
 
   async getLog(userId: number) {
@@ -159,10 +163,13 @@ export class CurrentUsersService {
   }
 
   async choiceRole(roomId: number, selectedUserId: number, role: number) {
-    return await this.currentUsersRepository.update(
-      { userId: selectedUserId },
-      { episodeId: role },
-    );
+    const result = await this.currentUsersRepository
+      .update({ userId: selectedUserId }, { episodeId: role })
+      .then((res) => res)
+      .catch((err) => {
+        console.log('choice role error', err);
+      });
+    return result;
   }
 
   async deleteRoom(roomId: number) {
