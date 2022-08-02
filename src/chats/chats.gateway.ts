@@ -222,6 +222,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('role_info')
   handleRoleInfo(@ConnectedSocket() socket: Socket) {
+    console.log('role info');
     return this.chatService.roleInfo(socket);
   }
 
