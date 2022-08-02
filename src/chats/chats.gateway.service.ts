@@ -22,6 +22,7 @@ export class ChatService {
     private readonly episodeService: EpisodeService,
   ) {}
   private logger = new Logger('CHATTING');
+  private loggerDebug = new Logger('DEBUG');
 
   connected(socket: Socket) {
     this.logger.log(`connected: ${socket.id}`);
@@ -478,6 +479,7 @@ export class ChatService {
       result[i].readyState = currentUser[i].readyState;
       delete result[i].password;
     }
+    this.loggerDebug.debug('HintRegister', room, hintRegisterResult, result);
 
     socket.emit('update_room', {
       roomInfo: room,
@@ -487,7 +489,6 @@ export class ChatService {
   }
 
   async reasoningTime(socket: Socket, roomId: number) {
-    console.log('reasoning time', roomId);
     const room = await this.roomsService.findRoomById(roomId);
     const payload = {
       title: room.title,
@@ -516,8 +517,7 @@ export class ChatService {
       delete result[i].password;
     }
 
-    console.log(roomInfo);
-
+    this.loggerDebug.debug('ReasoningTime', roomInfo, result);
     socket
       .to(room.roomUniqueId)
       .emit('update_room', { roomInfo, currentUser: result });
@@ -526,6 +526,7 @@ export class ChatService {
 
   async hintInBoard(socket: Socket, imageInfo: HintDto, roomId: number) {
     const room = await this.roomsService.findRoomById(roomId);
+    this.loggerDebug.debug('HintInBoard', imageInfo);
     socket.to(room.roomUniqueId).emit('hint_board', imageInfo);
     socket.emit('hint_board', imageInfo);
   }
@@ -568,8 +569,6 @@ export class ChatService {
       result[i].readyState = currentUser[i].readyState;
       delete result[i].password;
     }
-
-    console.log('kick user', result);
 
     socket
       .to(room.roomUniqueId)
@@ -614,6 +613,9 @@ export class ChatService {
       result[i].readyState = currentUser[i].readyState;
       delete result[i].password;
     }
+
+    this.loggerDebug.debug('ChoiceRole', room, result);
+
     socket.emit('new_chat', { message: `${episode[0].role}을 선택했습니다.` });
     socket
       .to(room.roomUniqueId)
@@ -655,6 +657,7 @@ export class ChatService {
         delete result[i].password;
       }
 
+      this.loggerDebug.debug('ForceQuit', roomInfo, result);
       socket
         .to(room.roomUniqueId)
         .emit('update_room', { roomInfo, currentUser: result });
@@ -673,6 +676,43 @@ export class ChatService {
 
   async roleInfo(socket: Socket) {
     const roles = await this.episodeService.allRole();
+    this.loggerDebug.debug('RoleInfo', roles);
     socket.emit('role_info', roles);
+  }
+
+  async end(socket: Socket, roomId: number) {
+    const room = await this.roomsService.findRoomById(roomId);
+    const payload = {
+      title: room.title,
+      password: room.password,
+      hintTime: room.hintTime,
+      reasoningTime: room.reasoningTime,
+      isRandom: room.isRandom,
+      count: room.count,
+      roomUniqueId: room.roomUniqueId,
+      roomState: 'end',
+      master: room.master,
+      userId: room.userId,
+      hintReady: room.hintReady,
+    };
+    await this.roomsService.updateRoom(roomId, payload);
+    const roomInfo = await this.roomsService.findRoomById(roomId);
+    const currentUser = await this.currentUsersService.currentUsers(roomId);
+
+    this.loggerDebug.debug('END', roomInfo, currentUser);
+
+    let result = [];
+    for (let i = 0; i < currentUser.length; i++) {
+      result.push({
+        ...(await this.usersService.findUserById(currentUser[i].userId)),
+        ...currentUser[i],
+      });
+      result[i].readyState = currentUser[i].readyState;
+      delete result[i].password;
+    }
+    socket
+      .to(room.roomUniqueId)
+      .emit('game_end', { roomInfo: room, currentUser: result });
+    socket.emit('game_end', { roomInfo: room, currentUser: result });
   }
 }
