@@ -1,4 +1,4 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger, HttpException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { EpisodeEntity } from './episode.entity';
 
@@ -22,6 +22,7 @@ export class EpisodeService {
       .catch((err) => {
         const logger = new Logger();
         logger.error('all roles error', err);
+        throw new Error('all role error');
       });
     return roles;
   }
