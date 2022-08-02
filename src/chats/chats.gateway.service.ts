@@ -675,4 +675,9 @@ export class ChatService {
       });
     }
   }
+
+  async roleInfo(socket: Socket) {
+    const roles = await this.episodeService.allRole();
+    socket.emit('role_info', roles);
+  }
 }

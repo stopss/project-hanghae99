@@ -219,4 +219,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ) {
     return this.chatService.forceQuit(socket, +data.roomId, +data.userId);
   }
+
+  @SubscribeMessage('role_info')
+  handleRoleInfo(@ConnectedSocket() socket: Socket) {
+    return this.chatService.roleInfo(socket);
+  }
 }
