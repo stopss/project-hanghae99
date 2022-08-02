@@ -396,6 +396,7 @@ export class ChatService {
   }
 
   async hintRoleChoiceTime(socket: Socket, roomId: number) {
+    console.log('hint role choice time', roomId);
     const room = await this.roomsService.findRoomById(roomId);
 
     const payload = { ...room, roomState: 'roleChoice' };
