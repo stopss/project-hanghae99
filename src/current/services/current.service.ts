@@ -42,6 +42,13 @@ export class CurrentUsersService {
     }
   }
 
+  async findUserByEpisodeId(episodeId: number) {
+    const user = await this.currentUsersRepository.findOne({
+      where: { episodeId },
+    });
+    return user;
+  }
+
   async getLog(userId: number) {
     const users = await this.currentUsersRepository.find({
       relations: {
@@ -73,7 +80,10 @@ export class CurrentUsersService {
   }
 
   async readyStateInit(userId: number) {
-    return await this.currentUsersRepository.update({ userId }, { readyState: false })
+    return await this.currentUsersRepository.update(
+      { userId },
+      { readyState: false },
+    );
   }
 
   async userJoinRoom(userId: number, roomId: number, streamId: string) {

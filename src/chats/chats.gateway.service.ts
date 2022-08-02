@@ -588,14 +588,18 @@ export class ChatService {
     socket: Socket,
     roomId: number,
     selectedUserId: number,
-    role: string,
+    episodeId: number,
   ) {
-    const episode = await this.episodeService.findEpisodeByRole(role);
-    if (episode.length === 1) return new WsException('이미 선택된 역할입니다.');
+    const episode = await this.episodeService.findEpisodeById(episodeId);
+    if (!episode) return new WsException('존재하지 않는 역할입니다.');
+    const isExistRole = await this.currentUsersService.findUserByEpisodeId(
+      episodeId,
+    );
+    if (isExistRole) throw new WsException('이미 선택된 역할입니다.');
     await this.currentUsersService.choiceRole(
       roomId,
       selectedUserId,
-      episode[0].id,
+      episode.id,
     );
     const currentUser = await this.currentUsersService.currentUsers(roomId);
     const room = await this.roomsService.findRoomById(roomId);

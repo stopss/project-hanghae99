@@ -197,13 +197,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('choice_role')
   hanldeChoiceRole(
     @ConnectedSocket() socket: Socket,
-    @MessageBody() data: { roomId: string; userId: string; role: string },
+    @MessageBody() data: { roomId: string; userId: string; episodeId: string },
   ) {
     return this.chatService.choiceRole(
       socket,
       +data.roomId,
       +data.userId,
-      data.role,
+      +data.episodeId,
     );
   }
 

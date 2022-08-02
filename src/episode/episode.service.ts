@@ -15,8 +15,8 @@ export class EpisodeService {
     return episode;
   }
 
-  async findEpisodeByRole(role: string) {
-    const episode = await this.episodeRepository.find({ where: { role } });
-    return episode;
-  }
+  // async findEpisodeByRole(role: string) {
+  //   const episode = await this.episodeRepository.find({ where: { role } });
+  //   return episode;
+  // }
 }
