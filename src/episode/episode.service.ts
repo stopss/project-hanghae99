@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { EpisodeEntity } from './episode.entity';
 
@@ -15,8 +15,19 @@ export class EpisodeService {
     return episode;
   }
 
-  async findEpisodeByRole(role: string) {
-    const episode = await this.episodeRepository.find({ where: { role } });
-    return episode;
+  async allRole() {
+    const roles = await this.episodeRepository
+      .find()
+      .then((res) => res)
+      .catch((err) => {
+        const logger = new Logger();
+        logger.error('all roles error', err);
+      });
+    return roles;
   }
+
+  // async findEpisodeByRole(role: string) {
+  //   const episode = await this.episodeRepository.find({ where: { role } });
+  //   return episode;
+  // }
 }

@@ -32,6 +32,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     return this.chatService.disconnected(socket);
   }
 
+  @SubscribeMessage('test')
+  test(@ConnectedSocket() Socket: Socket, @MessageBody() test: string) {
+    return this.chatService.test(test);
+  }
+
   @SubscribeMessage('submit_chat') handleSubmitChat(
     @MessageBody() chat: ChatDto,
     @ConnectedSocket() socket: Socket,
@@ -197,13 +202,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('choice_role')
   hanldeChoiceRole(
     @ConnectedSocket() socket: Socket,
-    @MessageBody() data: { roomId: string; userId: string; role: string },
+    @MessageBody() data: { roomId: string; userId: string; episodeId: string },
   ) {
     return this.chatService.choiceRole(
       socket,
       +data.roomId,
       +data.userId,
-      data.role,
+      +data.episodeId,
     );
   }
 
@@ -213,5 +218,18 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody() data: { roomId: string; userId: string },
   ) {
     return this.chatService.forceQuit(socket, +data.roomId, +data.userId);
+  }
+
+  @SubscribeMessage('role_info')
+  handleRoleInfo(@ConnectedSocket() socket: Socket) {
+    return this.chatService.roleInfo(socket);
+  }
+
+  @SubscribeMessage('game_end')
+  handleGameEnd(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() data: { roomId: string },
+  ) {
+    return this.chatService.end(socket, +data.roomId);
   }
 }
