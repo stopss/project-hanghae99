@@ -23,6 +23,10 @@ export class ChatService {
   ) {}
   private logger = new Logger('CHATTING');
 
+  async test(test: string) {
+    console.log(test);
+  }
+
   connected(socket: Socket) {
     this.logger.log(`connected: ${socket.id}`);
   }

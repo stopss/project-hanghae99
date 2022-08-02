@@ -32,6 +32,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     return this.chatService.disconnected(socket);
   }
 
+  @SubscribeMessage('test')
+  test(@ConnectedSocket() Socket: Socket, @MessageBody() test: string) {
+    return this.chatService.test(test);
+  }
+
   @SubscribeMessage('submit_chat') handleSubmitChat(
     @MessageBody() chat: ChatDto,
     @ConnectedSocket() socket: Socket,
