@@ -21,7 +21,11 @@ async function bootstrap() {
     cors: true,
   });
   appHttps.enableCors({
-    origin: ['https://whoru.name', 'https://www.whoru.name'],
+    origin: [
+      'https://whoru.name',
+      'https://www.whoru.name',
+      'http://localhost:3000',
+    ],
     methods: 'GET, HEAD, PUT, PATCH, POST, DELETE, OPTIONS',
     credentials: true,
   });
