@@ -15,11 +15,11 @@ import {
 import { CreateRoomDto } from '../dto/create.room.dto';
 import { RoomsService } from '../services/rooms.service';
 
+@UseGuards(JwtAuthGuard)
 @Controller('api')
 export class RoomsController {
   constructor(private readonly roomsService: RoomsService) {}
 
-  @UseGuards(JwtAuthGuard)
   @Post('/room/create')
   roomCreate(@Body() body: CreateRoomDto, @Req() req) {
     const master = req.user.nickname;

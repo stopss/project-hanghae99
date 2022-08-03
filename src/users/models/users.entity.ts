@@ -1,3 +1,4 @@
+import { AuthEntity } from 'src/auth/models/auth.entity';
 import { CurrentUserEntity } from 'src/current/models/current.users.entity';
 import { GameLogEntity } from 'src/log/models/logs.entity';
 import { RoomEntity } from 'src/rooms/models/rooms.entity';
@@ -34,4 +35,7 @@ export class UserEntity {
 
   @OneToMany(() => GameLogEntity, (log) => log.user)
   logs: GameLogEntity;
+
+  @OneToMany(() => AuthEntity, (auth) => auth.user)
+  auth: AuthEntity;
 }
