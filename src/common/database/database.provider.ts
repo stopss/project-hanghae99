@@ -5,6 +5,7 @@ import { RoomEntity } from 'src/rooms/models/rooms.entity';
 import { UserEntity } from 'src/users/models/users.entity';
 import { DataSource } from 'typeorm';
 import { GameLogEntity } from 'src/log/models/logs.entity';
+import { AuthEntity } from 'src/auth/models/auth.entity';
 export const databaseProviders = [
   {
     provide: 'DATA_SOURCE',
@@ -24,6 +25,7 @@ export const databaseProviders = [
           EpisodeEntity,
           ImageEntity,
           GameLogEntity,
+          AuthEntity,
         ],
         synchronize: true,
       });
