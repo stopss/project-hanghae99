@@ -677,6 +677,7 @@ export class ChatService {
   }
 
   async roleInfo(socket: Socket) {
+    this.loggerDebug.debug('RoleInfo', 'Here');
     const roles = await this.episodeService
       .allRole()
       .then((res) => {

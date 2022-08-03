@@ -1,3 +1,4 @@
+import { Logger } from '@nestjs/common';
 import { ChatService } from './chats.gateway.service';
 import {
   ConnectedSocket,
@@ -222,6 +223,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('role_info')
   handleRoleInfo(@ConnectedSocket() socket: Socket) {
+    const logger = new Logger('DEBUG');
+    logger.debug('HandleRoleInfo', 'debug');
     return this.chatService.roleInfo(socket);
   }
 
