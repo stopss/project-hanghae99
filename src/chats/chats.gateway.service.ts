@@ -741,11 +741,26 @@ export class ChatService {
     socket.emit('game_end', { roomInfo: room, currentUser: result });
   }
 
-  async vote(socket: Socket, votedUserId: number) {
+  async vote(socket: Socket, roomId: number, votedUserId: number) {
+    const room = await this.roomsService.findRoomById(roomId);
     const votedUser = await this.usersService.findUserById(votedUserId);
     if (!votedUser) throw new WsException('존재하지 않는 유저입니다.');
 
     await this.currentUsersService.vote(votedUserId);
-    socket.emit('vote', { votedUser });
+    const currentUser = await this.currentUsersService.currentUsers(roomId);
+
+    let result = [];
+    for (let i = 0; i < currentUser.length; i++) {
+      result.push({
+        ...(await this.usersService.findUserById(currentUser[i].userId)),
+        ...currentUser[i],
+      });
+      result[i].readyState = currentUser[i].readyState;
+      delete result[i].password;
+    }
+    socket
+      .to(room.roomUniqueId)
+      .emit('update_room', { roomInfo: room, currentUser: result });
+    socket.emit('update_room', { roomInfo: room, currentUser: result });
   }
 }

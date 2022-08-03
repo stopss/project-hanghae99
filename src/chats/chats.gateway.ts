@@ -252,8 +252,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('vote')
   handleVote(
     @ConnectedSocket() socket: Socket,
-    @MessageBody() data: { userId },
+    @MessageBody() data: { userId: string; roomId: string },
   ) {
-    return this.chatService.vote(socket, +data.userId);
+    return this.chatService.vote(socket, +data.roomId, +data.userId);
   }
 }
