@@ -8,14 +8,14 @@ import helmet from 'helmet';
 import * as fs from 'fs';
 
 async function bootstrap() {
-  // const httpsOptions = {
-  //   ca: fs.readFileSync('/etc/letsencrypt/live/whoru-back.kr/fullchain.pem'),
-  //   key: fs.readFileSync('/etc/letsencrypt/live/whoru-back.kr/privkey.pem'),
-  //   cert: fs.readFileSync('/etc/letsencrypt/live/whoru-back.kr/cert.pem'),
-  // };
+  const httpsOptions = {
+    ca: fs.readFileSync('/etc/letsencrypt/live/whoru-back.kr/fullchain.pem'),
+    key: fs.readFileSync('/etc/letsencrypt/live/whoru-back.kr/privkey.pem'),
+    cert: fs.readFileSync('/etc/letsencrypt/live/whoru-back.kr/cert.pem'),
+  };
   const appHttps = await NestFactory.create<NestExpressApplication>(AppModule, {
     cors: true,
-    // httpsOptions,
+    httpsOptions,
   });
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     cors: true,
