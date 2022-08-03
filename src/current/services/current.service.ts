@@ -47,9 +47,6 @@ export class CurrentUsersService {
     const result = rooms.forEach((room) => {
       if (room.episodeId === episodeId) return null;
     });
-    // const user = await this.currentUsersRepository.findOne({
-    //   where: { episodeId },
-    // });
     return true;
   }
 

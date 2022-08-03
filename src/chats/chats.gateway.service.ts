@@ -373,19 +373,7 @@ export class ChatService {
       result[i].hintReady = currentUser[i].hintReady;
       delete result[i].password;
     }
-    const payload = {
-      title: room.title,
-      password: room.password,
-      hintTime: room.hintTime,
-      reasoningTime: room.reasoningTime,
-      isRandom: room.isRandom,
-      count: room.count,
-      roomUniqueId: room.roomUniqueId,
-      roomState: room.roomState,
-      master: room.master,
-      userId: room.userId,
-      hintReady: room.hintReady + 1,
-    };
+    const payload = { ...room, hintReady: room.hintReady + 1 };
     await this.roomsService.updateRoom(roomId, payload);
     const resultRoom = await this.roomsService.findRoomById(roomId);
     socket.to(room.roomUniqueId).emit('update_room', {
@@ -425,26 +413,36 @@ export class ChatService {
 
   async hintStart(socket: Socket, userId: number, roomId: number) {
     const room = await this.roomsService.findRoomById(roomId);
-    // if (room.hintReady !== 2) {
-    //   throw new WsException(
-    //     '모든 유저가 준비완료가 되어야 시작할 수 있습니다.',
-    //   );
-    // }
+    const currentUsers = await this.currentUsersService.currentUsers(roomId);
+
+    const selectedEpisodeId: Array<number> = [];
+    const notSelectUserId: Array<number> = [];
+    const notSelectedEpisodeId: Array<number> = [];
+
+    currentUsers.forEach((user) => {
+      if (user.episodeId !== null) selectedEpisodeId.push(user.episodeId);
+      else notSelectUserId.push(user.userId);
+    });
+
+    console.log('selectedEpisodeId', selectedEpisodeId);
+    console.log('notSelectUserId', notSelectUserId);
+
+    if (selectedEpisodeId.length < 2) {
+      for (let i = 0; i < 5; i++) {
+        if (!selectedEpisodeId.includes(i + 1))
+          notSelectedEpisodeId.push(i + 1);
+      }
+      for (let i = 0; i < notSelectUserId.length; i++) {
+        await this.currentUsersService.choiceRole(
+          roomId,
+          notSelectUserId[i],
+          notSelectedEpisodeId[i],
+        );
+      }
+    }
     // TODO: 게임시작하면 GameLog에 게임 로그 기록
 
-    const payload = {
-      title: room.title,
-      password: room.password,
-      hintTime: room.hintTime,
-      reasoningTime: room.reasoningTime,
-      isRandom: room.isRandom,
-      count: room.count,
-      roomUniqueId: room.roomUniqueId,
-      roomState: 'hintTime',
-      master: room.master,
-      userId: room.userId,
-      hintReady: room.hintReady,
-    };
+    const payload = { ...room, roomState: 'hintTime' };
     await this.roomsService.updateRoom(roomId, payload);
     const roomInfo = await this.roomsService.findRoomById(roomId);
     const currentUser = await this.currentUsersService.currentUsers(roomId);
@@ -621,7 +619,6 @@ export class ChatService {
 
     this.loggerDebug.debug('ChoiceRole', room, result);
 
-    socket.emit('new_chat', { message: `${episode[0].role}을 선택했습니다.` });
     socket
       .to(room.roomUniqueId)
       .emit('update_room', { roomInfo: room, currentUser: result });
