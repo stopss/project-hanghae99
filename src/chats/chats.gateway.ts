@@ -232,4 +232,20 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ) {
     return this.chatService.end(socket, +data.roomId);
   }
+
+  @SubscribeMessage('image_list')
+  handleRegisterImageLists(
+    @MessageBody()
+    data: {
+      roomId: string;
+      userId: string;
+      imageUrlLists: Array<string>;
+    },
+  ) {
+    return this.chatService.registerImageLists(
+      +data.roomId,
+      +data.userId,
+      data.imageUrlLists,
+    );
+  }
 }
