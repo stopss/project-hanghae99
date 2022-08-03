@@ -18,6 +18,7 @@ import { CurrentUserEntity } from './current/models/current.users.entity';
 import { EpisodeEntity } from './episode/episode.entity';
 import { ImageEntity } from './images/images.entity';
 import { GameLogEntity } from './log/models/logs.entity';
+import { AuthEntity } from './auth/models/auth.entity';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { GameLogEntity } from './log/models/logs.entity';
         EpisodeEntity,
         ImageEntity,
         GameLogEntity,
+        AuthEntity,
       ],
       synchronize: true,
     }),
