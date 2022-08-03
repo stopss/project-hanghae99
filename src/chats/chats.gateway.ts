@@ -248,4 +248,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       data.imageUrlLists,
     );
   }
+
+  @SubscribeMessage('vote')
+  handleVote(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() data: { userId },
+  ) {
+    return this.chatService.vote(socket, +data.userId);
+  }
 }

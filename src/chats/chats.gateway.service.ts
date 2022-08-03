@@ -740,4 +740,12 @@ export class ChatService {
       .emit('game_end', { roomInfo: room, currentUser: result });
     socket.emit('game_end', { roomInfo: room, currentUser: result });
   }
+
+  async vote(socket: Socket, votedUserId: number) {
+    const votedUser = await this.usersService.findUserById(votedUserId);
+    if (!votedUser) throw new WsException('존재하지 않는 유저입니다.');
+
+    await this.currentUsersService.vote(votedUserId);
+    socket.emit('vote', { votedUser });
+  }
 }
