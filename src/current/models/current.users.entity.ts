@@ -1,3 +1,4 @@
+import { IsBoolean } from 'class-validator';
 import { EpisodeEntity } from 'src/episode/episode.entity';
 import { ImageEntity } from 'src/images/images.entity';
 import { RoomEntity } from 'src/rooms/models/rooms.entity';
@@ -42,6 +43,10 @@ export class CurrentUserEntity {
 
   @Column({ nullable: true })
   streamId: string;
+
+  @Column({ default: false })
+  @IsBoolean()
+  imageReady: boolean;
 
   @ManyToOne(() => UserEntity, (user) => user.users)
   @JoinColumn([{ name: 'userId', referencedColumnName: 'id' }])

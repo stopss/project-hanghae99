@@ -1,7 +1,7 @@
 import { DataSource } from 'typeorm';
 import { ImageEntity } from './images.entity';
 
-export const userProviders = [
+export const ImageProvider = [
   {
     provide: 'IMAGE_REPOSITORY',
     useFactory: (dataSource: DataSource) =>

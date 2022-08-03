@@ -1,3 +1,5 @@
+import { DataSource } from 'typeorm';
+import { ImageService } from './../images/images.services';
 import { UsersService } from './../users/services/users.service';
 import { RoomsService } from './../rooms/services/rooms.service';
 import { Injectable, Logger } from '@nestjs/common';
@@ -20,6 +22,8 @@ export class ChatService {
     private readonly usersService: UsersService,
     private readonly currentUsersService: CurrentUsersService,
     private readonly episodeService: EpisodeService,
+    private readonly imagesService: ImageService,
+    private readonly dataSource: DataSource,
   ) {}
   private logger = new Logger('CHATTING');
   private loggerDebug = new Logger('DEBUG');
@@ -491,24 +495,39 @@ export class ChatService {
     });
   }
 
+  async registerImageLists(
+    roomId: number,
+    userId: number,
+    imageUrlLists: Array<string>,
+  ) {
+    const queryRunner = this.dataSource.createQueryRunner();
+    const isExistUser = await this.usersService.findUserById(userId);
+    if (!isExistUser) throw new WsException('존재하지 않는 유저입니다');
+
+    const isExistRoom = await this.roomsService.findRoomById(roomId);
+    if (!isExistRoom) throw new WsException('존재하지 않는 방입니다.');
+
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      this.imagesService.registerImageUrlLists(roomId, userId, imageUrlLists);
+      this.currentUsersService.imageReadyUpdate(userId);
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      return error;
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
   async reasoningTime(socket: Socket, roomId: number) {
     const room = await this.roomsService.findRoomById(roomId);
-    const payload = {
-      title: room.title,
-      password: room.password,
-      hintTime: room.hintTime,
-      reasoningTime: room.reasoningTime,
-      isRandom: room.isRandom,
-      count: room.count,
-      roomUniqueId: room.roomUniqueId,
-      roomState: 'reasoningTime',
-      master: room.master,
-      userId: room.userId,
-      hintReady: room.hintReady,
-    };
+    const payload = { ...room, roomState: 'reasoningTime' };
     await this.roomsService.updateRoom(roomId, payload);
     const roomInfo = await this.roomsService.findRoomById(roomId);
     const currentUser = await this.currentUsersService.currentUsers(roomId);
+    const imageUrlLists = await this.imagesService.findListsByRoomId(roomId);
 
     let result = [];
     for (let i = 0; i < currentUser.length; i++) {
@@ -520,11 +539,12 @@ export class ChatService {
       delete result[i].password;
     }
 
-    this.loggerDebug.debug('ReasoningTime', roomInfo, result);
     socket
       .to(room.roomUniqueId)
       .emit('update_room', { roomInfo, currentUser: result });
     socket.emit('update_room', { roomInfo, currentUser: result });
+    socket.emit('board_image', { imageUrlLists });
+    socket.to(room.roomUniqueId).emit('board_image', { imageUrlLists });
   }
 
   async hintInBoard(socket: Socket, imageInfo: HintDto, roomId: number) {

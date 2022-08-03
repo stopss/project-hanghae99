@@ -1,4 +1,4 @@
-import { IsString } from 'class-validator';
+import { IsString, IsNumber } from 'class-validator';
 import { CurrentUserEntity } from 'src/current/models/current.users.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
@@ -7,9 +7,17 @@ export class ImageEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ nullable: true })
   @IsString()
-  imageUrl: string;
+  imageUrlLists: string;
+
+  @Column({ nullable: true })
+  @IsNumber()
+  roomId: number;
+
+  @Column({ nullable: true })
+  @IsNumber()
+  userId: number;
 
   @OneToMany(() => CurrentUserEntity, (currentusers) => currentusers.imageUrl)
   images: CurrentUserEntity;
