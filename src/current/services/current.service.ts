@@ -11,7 +11,7 @@ export class CurrentUsersService {
 
   async imageReadyUpdate(userId: number) {
     const imageReadyState = await this.currentUsersRepository
-      .update({ userId }, { hintReady: true })
+      .update({ userId }, { imageReady: true })
       .then((res) => res)
       .catch((err) => err);
     return imageReadyState;
