@@ -6,13 +6,7 @@ import { episodeProviders } from './episode.provider';
 import { EpisodeService } from './services/episode.service';
 
 @Module({
-  imports: [
-    ThrottlerModule.forRoot({
-      ttl: 60,
-      limit: 10,
-    }),
-    DatabaseModule,
-  ],
+  imports: [DatabaseModule],
   providers: [EpisodeService, ...episodeProviders],
   controllers: [EpisodeController],
   exports: [EpisodeService],
