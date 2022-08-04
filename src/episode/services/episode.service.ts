@@ -1,6 +1,6 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import { EpisodeEntity } from './episode.entity';
+import { EpisodeEntity } from '../episode.entity';
 
 @Injectable()
 export class EpisodeService {
