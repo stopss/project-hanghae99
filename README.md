@@ -2,4 +2,4 @@
 
 ### E반 1조
 
-![thumbnail](./images/thumnail.png)
+![thumbnail](./images/thumbnail.png)
