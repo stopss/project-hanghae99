@@ -11,14 +11,35 @@ import { CurrentUsersModule } from './current/current.users.module';
 import { EpisodeModule } from './episode/episode.module';
 import { ImagesModule } from './images/images.module';
 import { LogModule } from './log/log.module';
-import { ThrottlerModule } from '@nestjs/throttler';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { UserEntity } from './users/models/users.entity';
+import { RoomEntity } from './rooms/models/rooms.entity';
+import { CurrentUserEntity } from './current/models/current.users.entity';
+import { EpisodeEntity } from './episode/episode.entity';
+import { ImageEntity } from './images/images.entity';
+import { GameLogEntity } from './log/models/logs.entity';
+import { AuthEntity } from './auth/models/auth.entity';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
-    ThrottlerModule.forRoot({
-      ttl: 60,
-      limit: 10,
+    TypeOrmModule.forRoot({
+      type: 'mysql',
+      host: process.env.DATABASE_HOST,
+      port: 3305,
+      username: process.env.DATABASE_USERNAME,
+      password: process.env.DATABASE_PASSWORD,
+      database: process.env.DATABASE,
+      entities: [
+        UserEntity,
+        RoomEntity,
+        CurrentUserEntity,
+        EpisodeEntity,
+        ImageEntity,
+        GameLogEntity,
+        AuthEntity,
+      ],
+      synchronize: true,
     }),
     AuthModule,
     UsersModule,

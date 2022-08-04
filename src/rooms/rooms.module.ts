@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ThrottlerModule } from '@nestjs/throttler';
+import { AuthModule } from 'src/auth/auth.module';
 import { DatabaseModule } from 'src/common/database/database.module';
 import { UsersModule } from 'src/users/users.module';
 import { RoomsController } from './controllers/rooms.controller';
@@ -7,14 +7,7 @@ import { roomProviders } from './models/rooms.provider';
 import { RoomsService } from './services/rooms.service';
 
 @Module({
-  imports: [
-    ThrottlerModule.forRoot({
-      ttl: 60,
-      limit: 10,
-    }),
-    DatabaseModule,
-    UsersModule,
-  ],
+  imports: [DatabaseModule, UsersModule, AuthModule],
   providers: [RoomsService, ...roomProviders],
   controllers: [RoomsController],
   exports: [RoomsService],

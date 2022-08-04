@@ -9,6 +9,14 @@ export class CurrentUsersService {
     private readonly currentUsersRepository: Repository<CurrentUserEntity>,
   ) {}
 
+  async imageReadyUpdate(userId: number) {
+    const imageReadyState = await this.currentUsersRepository
+      .update({ userId }, { imageReady: true })
+      .then((res) => res)
+      .catch((err) => err);
+    return imageReadyState;
+  }
+
   async readyStateUpdate(userId: number, roomId: number) {
     const user = new CurrentUserEntity();
     const userReadyState = await this.currentUsersRepository.findOne({

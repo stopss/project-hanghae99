@@ -235,4 +235,30 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ) {
     return this.chatService.end(socket, +data.roomId);
   }
+
+  @SubscribeMessage('image_list')
+  handleRegisterImageLists(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody()
+    data: {
+      roomId: string;
+      userId: string;
+      imageUrlLists: Array<string>;
+    },
+  ) {
+    return this.chatService.registerImageLists(
+      socket,
+      +data.roomId,
+      +data.userId,
+      data.imageUrlLists,
+    );
+  }
+
+  @SubscribeMessage('vote')
+  handleVote(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() data: { userId: string; roomId: string },
+  ) {
+    return this.chatService.vote(socket, +data.roomId, +data.userId);
+  }
 }

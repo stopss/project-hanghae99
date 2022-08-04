@@ -1,16 +1,16 @@
 import { UsersService } from '../users/services/users.service';
 import * as bcrypt from 'bcrypt';
-import {
-  ConsoleLogger,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { LoginUserDto } from './dto/login.request.dto';
 import { JwtService } from '@nestjs/jwt';
+import { AuthEntity } from './models/auth.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class AuthService {
   constructor(
+    @Inject('AUTH_REPOSITORY')
+    private authRepository: Repository<AuthEntity>,
     private usersService: UsersService,
     private jwtService: JwtService,
   ) {}
@@ -42,8 +42,35 @@ export class AuthService {
       nickname: user.nickname,
       social: user.social,
     };
+
+    const token = this.jwtService.sign(payload);
+    await this.existAuth(user.id, token);
     return {
-      token: this.jwtService.sign(payload),
+      token: token,
     };
+  }
+
+  async findAuthByUserId(userId: number) {
+    const user = await this.authRepository.findOne({ where: { userId } });
+    return user;
+  }
+
+  async validateUser(token: string) {
+    const result = await this.authRepository.findOne({ where: { token } });
+    // console.log('result', result);
+    return result;
+  }
+
+  async existAuth(id: number, token: string): Promise<any> {
+    const auth = new AuthEntity();
+    const userExist = await this.authRepository.find({ where: { userId: id } });
+    console.log('userExist', userExist);
+    if (userExist.length === 0) {
+      auth.userId = id;
+      auth.token = token;
+      await this.authRepository.save(auth);
+    } else {
+      await this.authRepository.update(id, { token });
+    }
   }
 }

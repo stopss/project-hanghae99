@@ -7,10 +7,13 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { LoginUserDto } from './dto/login.request.dto';
 import { JwtStrategy } from './jwt/jwt.strategy';
-import { ThrottlerModule } from '@nestjs/throttler';
+import { AuthProviders } from './models/auth.provider';
+import { DatabaseModule } from 'src/common/database/database.module';
+import { JwtAuthGuard } from './jwt/jwt.guard';
 
 @Module({
   imports: [
+    DatabaseModule,
     ConfigModule.forRoot(),
     ThrottlerModule.forRoot({
       ttl: 60,
@@ -23,7 +26,13 @@ import { ThrottlerModule } from '@nestjs/throttler';
       signOptions: { expiresIn: '1y' },
     }),
   ],
-  providers: [AuthService, LoginUserDto, JwtStrategy],
+  providers: [
+    AuthService,
+    LoginUserDto,
+    JwtStrategy,
+    JwtAuthGuard,
+    ...AuthProviders,
+  ],
   exports: [AuthService, LoginUserDto],
 })
 export class AuthModule {}
