@@ -24,7 +24,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     const token = authorization.replace('Bearer ', '');
 
     await this.validateRequest(token);
-
+    super.canActivate(context);
     return true;
   }
 

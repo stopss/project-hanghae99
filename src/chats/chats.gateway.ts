@@ -235,6 +235,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('image_list')
   handleRegisterImageLists(
+    @ConnectedSocket() socket: Socket,
     @MessageBody()
     data: {
       roomId: string;
@@ -243,6 +244,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     },
   ) {
     return this.chatService.registerImageLists(
+      socket,
       +data.roomId,
       +data.userId,
       data.imageUrlLists,

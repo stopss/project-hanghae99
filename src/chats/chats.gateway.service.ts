@@ -496,6 +496,7 @@ export class ChatService {
   }
 
   async registerImageLists(
+    socket: Socket,
     roomId: number,
     userId: number,
     imageUrlLists: Array<string>,
@@ -512,7 +513,24 @@ export class ChatService {
 
     try {
       this.imagesService.registerImageUrlLists(roomId, userId, imageUrlLists);
-      this.currentUsersService.imageReadyUpdate(userId);
+      await this.currentUsersService.imageReadyUpdate(userId);
+      const currentUser = await this.currentUsersService.currentUsers(roomId);
+      const room = await this.roomsService.findRoomById(roomId);
+
+      let result = [];
+      for (let i = 0; i < currentUser.length; i++) {
+        result.push({
+          ...(await this.usersService.findUserById(currentUser[i].userId)),
+          ...currentUser[i],
+        });
+        result[i].readyState = currentUser[i].readyState;
+        delete result[i].password;
+      }
+
+      socket
+        .to(room.roomUniqueId)
+        .emit('update_room', { roomInfo: room, currentUser: result });
+      socket.emit('update_room', { roomInfo: room, currentUser: result });
     } catch (error) {
       await queryRunner.rollbackTransaction();
       return error;
