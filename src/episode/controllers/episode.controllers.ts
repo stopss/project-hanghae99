@@ -1,11 +1,11 @@
 import { EpisodeService } from 'src/episode/services/episode.service';
 import { Controller, Get } from '@nestjs/common';
 
-@Controller('episodes')
+@Controller('roles')
 export class EpisodeController {
   constructor(private readonly episodeService: EpisodeService) {}
 
-  @Get('roles')
+  @Get()
   getRole() {
     return this.episodeService.allRole();
   }
