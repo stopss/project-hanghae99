@@ -221,12 +221,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     return this.chatService.forceQuit(socket, +data.roomId, +data.userId);
   }
 
-  @SubscribeMessage('role_info')
-  handleRoleInfo(@ConnectedSocket() socket: Socket) {
-    const logger = new Logger('DEBUG');
-    logger.debug('HandleRoleInfo', 'debug');
-    return this.chatService.roleInfo(socket);
-  }
+  // @SubscribeMessage('role_info')
+  // handleRoleInfo(@ConnectedSocket() socket: Socket) {
+  //   const logger = new Logger('DEBUG');
+  //   logger.debug('HandleRoleInfo', 'debug');
+  //   return this.chatService.roleInfo(socket);
+  // }
 
   @SubscribeMessage('game_end')
   handleGameEnd(
