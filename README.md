@@ -9,6 +9,10 @@
 
 [WHORU 바로가기!](https://whoru.name)
 
+[시연영상 바로가기](https://www.youtube.com/watch?v=YkYWM1PpSPU)
+
+[발표영상 바로가기](https://www.youtube.com/watch?v=c9fDa66aGBo&t=3s)
+
 ---
 
 ## ✅ 작업 기간 및 팀원 소개 ✅
