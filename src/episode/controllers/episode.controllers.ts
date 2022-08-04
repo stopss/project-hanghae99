@@ -1,5 +1,5 @@
 import { EpisodeService } from 'src/episode/services/episode.service';
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Logger } from '@nestjs/common';
 
 @Controller('roles')
 export class EpisodeController {
@@ -7,6 +7,8 @@ export class EpisodeController {
 
   @Get()
   getRole() {
+    const logger = new Logger('DEBUG');
+    logger.debug('GET ROLES');
     return this.episodeService.allRole();
   }
 }
