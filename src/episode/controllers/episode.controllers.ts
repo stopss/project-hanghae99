@@ -6,7 +6,7 @@ import { Controller, Get, UseGuards, Logger, Req } from '@nestjs/common';
 export class EpisodeController {
   constructor(private readonly episodeService: EpisodeService) {}
 
-  @Get()
+  @Get('/lists')
   @UseGuards(JwtAuthGuard)
   getRole(@Req() req) {
     const logger = new Logger('DEBUG');
