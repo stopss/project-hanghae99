@@ -29,11 +29,13 @@ export class ImageService {
     await queryRunner.startTransaction();
 
     try {
-      const imageUrl = new ImageEntity();
-      imageUrl.roomId = roomId;
-      imageUrl.userId = userId;
-      imageUrl.imageUrlLists = imageUrlLists.toString();
-      await this.imagesRepository.save(imageUrl);
+      for (let i = 0; i < imageUrlLists.length; i++) {
+        const imageUrl = new ImageEntity();
+        imageUrl.roomId = roomId;
+        imageUrl.userId = userId;
+        imageUrl.imageUrlLists = imageUrlLists[i].toString();
+        await this.imagesRepository.save(imageUrl);
+      }
     } catch (error) {
       await queryRunner.rollbackTransaction();
       return error;
