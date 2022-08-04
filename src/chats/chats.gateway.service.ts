@@ -13,7 +13,7 @@ import { UpdateRoomDto } from './dto/update.room.dto';
 import { CreateRoomDto } from './dto/create.room.dto';
 import { PeerRoomDto } from './dto/peer.room.dto';
 import { HintDto } from './dto/hint.dto';
-import { EpisodeService } from 'src/episode/episode.service';
+import { EpisodeService } from 'src/episode/services/episode.service';
 
 @Injectable()
 export class ChatService {
